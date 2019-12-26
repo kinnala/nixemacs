@@ -255,6 +255,14 @@
 
 (use-package nix-mode)
 
+(use-package ivy-pass
+  :commands ivy-pass
+  :init
+  (defun pass ()
+    "Call ivy-pass."
+    (interactive)
+    (ivy-pass)))
+
 ;; move lines, from https://github.com/kinnala/move-lines
 
 (defun move-lines--internal (n)
