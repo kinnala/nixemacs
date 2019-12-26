@@ -22,8 +22,9 @@
     (interactive)
     (goto-char (point-min))
     (while (re-search-forward tag nil t)
-      (add-text-properties (match-beginning 0) (+ (match-beginning 0) 10)
-                           `(face (:background, backcolor, :foreground, forecolor)))))
+      (add-text-properties
+       (match-beginning 0) (+ (match-beginning 0) 10)
+       `(face (:background, backcolor, :foreground, forecolor)))))
   (setq org-default-notes-file "~/Dropbox/Notes/gtd/inbox.org"
         org-agenda-files '("~/Dropbox/Notes/gtd/inbox.org"
                            "~/Dropbox/Notes/gtd/tickler.org"
@@ -184,20 +185,20 @@
   (set-face-attribute 'mode-line nil :font "Ubuntu Mono-10")
   (set-face-attribute 'mode-line-inactive nil :font "Ubuntu Mono-10")
   (set-face-attribute 'default nil :font "Ubuntu Mono-14")
-  (setq initial-frame-alist '(
-                              (mouse-color           . "midnightblue")
-                              (foreground-color      . "grey20")
-                              (background-color      . "FloralWhite")
-                              (internal-border-width . 2)
-                              (line-spacing          . 1)
-                              (top . 20) (left . 650) (width . 100) (height . 24)))
-  (setq default-frame-alist '(
-                              (border-color          . "#4e3832")
-                              (foreground-color      . "grey10")
-                              (background-color      . "FloralWhite")
-                              (cursor-color          . "purple")
-                              (cursor-type           . box)
-                              (top . 30) (left . 150) (width . 100) (height . 24))))
+  (setq initial-frame-alist
+        '((mouse-color           . "midnightblue")
+          (foreground-color      . "grey20")
+          (background-color      . "FloralWhite")
+          (internal-border-width . 2)
+          (line-spacing          . 1)
+          (top . 20) (left . 650) (width . 88) (height . 24)))
+  (setq default-frame-alist
+        '((border-color          . "#4e3832")
+          (foreground-color      . "grey10")
+          (background-color      . "FloralWhite")
+          (cursor-color          . "purple")
+          (cursor-type           . box)
+          (top . 30) (left . 150) (width . 88) (height . 24))))
 
 (use-package highlight-indentation
   :init
