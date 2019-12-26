@@ -6,5 +6,7 @@ self: super: {
     google-chrome = self.google-chrome;
     git = self.git;
     slack = self.slack;
+    gnupg = self.gnupg;
+    pass = self.pass;
   };
 }
