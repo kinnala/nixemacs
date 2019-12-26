@@ -7,5 +7,6 @@ self: super: {
     google-chrome = self.google-chrome;
     gnupg = self.gnupg;
     pass = self.pass;
+    ripgrep = self.ripgrep;
   };
 }
