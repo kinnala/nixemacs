@@ -191,14 +191,14 @@
           (background-color      . "FloralWhite")
           (internal-border-width . 2)
           (line-spacing          . 1)
-          (top . 20) (left . 650) (width . 88) (height . 24)))
+          (top . 20) (left . 650) (width . 88) (height . 26)))
   (setq default-frame-alist
         '((border-color          . "#4e3832")
           (foreground-color      . "grey10")
           (background-color      . "FloralWhite")
           (cursor-color          . "purple")
           (cursor-type           . box)
-          (top . 30) (left . 150) (width . 88) (height . 24))))
+          (top . 30) (left . 150) (width . 88) (height . 26))))
 
 (use-package highlight-indentation
   :init
