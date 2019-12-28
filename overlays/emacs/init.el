@@ -518,5 +518,8 @@ region, down by N lines, or 1 line if N is nil."
   (lambda () (interactive)
     (tom/select-frame 3)))
 
+;; bind compile
+(define-key global-map (kbd "<f12>") 'compile)
+
 ;; load private configurations
 (load "~/Dropbox/Config/emacs/private.el" t)
