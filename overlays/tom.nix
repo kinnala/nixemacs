@@ -9,5 +9,7 @@ self: super: {
     ripgrep = self.ripgrep;
     vim = self.vim;
     htop = self.htop;
+    gmsh = self.gmsh;
+    suitesparse = self.suitesparse;
   };
 }
