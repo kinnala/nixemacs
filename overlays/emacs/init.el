@@ -182,8 +182,11 @@
    'diredfl-read-priv nil :foreground "#000000" :background "#DDFFDD")
   (set-face-attribute
    'diredfl-exec-priv nil :foreground "#000000" :background "#DDDDDFF")
-  (set-face-attribute 'mode-line nil :font "Ubuntu Mono-10")
-  (set-face-attribute 'mode-line-inactive nil :font "Ubuntu Mono-10")
+  (set-face-attribute 'mode-line nil
+                      :font "Ubuntu Mono-12"
+                      :background "#555"
+                      :foreground "#FFF")
+  (set-face-attribute 'mode-line-inactive nil :font "Ubuntu Mono-12")
   (set-face-attribute 'default nil :font "Ubuntu Mono-14")
   (setq initial-frame-alist
         '((mouse-color           . "midnightblue")
