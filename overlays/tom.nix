@@ -11,5 +11,6 @@ self: super: {
     htop = self.htop;
     gmsh = self.gmsh;
     suitesparse = self.suitesparse;
+    gnumake = self.gnumake;
   };
 }
