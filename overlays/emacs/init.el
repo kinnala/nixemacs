@@ -70,7 +70,7 @@
   ivy-mode
   :init
   (ivy-mode 1)
-  (setq ivy-height 12
+  (setq ivy-height 15
         ivy-fixed-height-minibuffer t
        	ivy-use-virtual-buffers t)
   :bind (("C-x b" . ivy-switch-buffer)
