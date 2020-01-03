@@ -78,15 +78,20 @@
 	 ("C-x C-b" . ibuffer)))
 
 (use-package counsel
+  :init
+  (setq counsel-find-file-ignore-regexp "\\archive\\'")
+  (defun counsel-org-rg ()
+    "Search org notes using ripgrep."
+    (interactive)
+    (counsel-rg "-g*org -g!*archive* -- " "~/Dropbox/Notes" nil nil))
   :bind (("M-x" . counsel-M-x)
          ("C-x C-f" . counsel-find-file)
          ("C-c g" . counsel-rg)
-         ("C-c f" . counsel-file-jump)
+         ("C-c o" . counsel-org-rg)
          ("C-c G" . counsel-git)
          ("C-x b" . counsel-switch-buffer)
          ("C-c h" . counsel-minibuffer-history)
-         ("M-y" . counsel-yank-pop))
-  :init (setq counsel-find-file-ignore-regexp "\\archive\\'"))
+         ("M-y" . counsel-yank-pop)))
 
 (use-package swiper
   :bind ("C-c s" . swiper))
