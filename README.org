@@ -1,6 +1,24 @@
-* Installation
+* Setting up a new computer
 
-Install Nix, clone this repository to =$HOME/.config/=, and run
+** Install Ubuntu
+
+Remember to encrypt hard drives.
+
+** Install software
+
+- dropbox
+- docker
+- git
+- nix
+
+** Create symlinks
+
+- $HOME/.profile
+- $HOME/.gnupg
+- $HOME/.config/nixpkgs
+
+** Install Nix packages
+
 #+begin_src sh
 nix-env -iA nixpkgs.tom
 #+end_src
