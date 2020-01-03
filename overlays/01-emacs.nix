@@ -1,5 +1,6 @@
 self: super: {
   emacs_config = self.writeText "default.el" (builtins.readFile ./emacs/init.el);
+  emacs_desktop = self.writeText "emacs.desktop" (builtins.readFile ./emacs/emacs.desktop);
   emacs = self.emacsWithPackages (epkgs: (with epkgs.melpaPackages; [
     use-package
     hydra
@@ -34,5 +35,8 @@ self: super: {
   ]) ++ [ (self.runCommand "default.el" {} ''
 mkdir -p $out/share/emacs/site-lisp
 cp ${self.emacs_config} $out/share/emacs/site-lisp/default.el
+'') ] ++ [ (self.runCommand "emacs.desktop" {} ''
+mkdir -p $out/share/applications
+cp ${self.emacs_desktop} $out/share/applications/emacs.desktop
 '') ]);
 }
