@@ -35,8 +35,5 @@ self: super: {
   ]) ++ [ (self.runCommand "default.el" {} ''
 mkdir -p $out/share/emacs/site-lisp
 cp ${self.emacs_config} $out/share/emacs/site-lisp/default.el
-'') ] ++ [ (self.runCommand "emacs.desktop" {} ''
-mkdir -p $out/share/applications
-cp ${self.emacs_desktop} $out/share/applications/emacs.desktop
 '') ]);
 }
