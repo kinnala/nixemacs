@@ -7,7 +7,6 @@ self: super: {
     gnupg = self.gnupg;
     pass = self.pass;
     ripgrep = self.ripgrep;
-    vim = self.vim;
     htop = self.htop;
     gmsh = self.gmsh;
     suitesparse = self.suitesparse;
