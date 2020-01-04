@@ -84,11 +84,21 @@
     "Search org notes using ripgrep."
     (interactive)
     (counsel-rg "-g*org -g!*archive* -- " "~/Dropbox/Notes" nil nil))
+  (defun counsel-nixpkgs-rg ()
+    "Search nixpkgs using ripgrep."
+    (interactive)
+    (counsel-rg "" "~/.nix-defexpr/channels/nixpkgs" nil nil))
+  (defun counsel-nixpkgs-file ()
+    "Search nixpkgs using ripgrep."
+    (interactive)
+    (counsel-file-jump "" "~/.nix-defexpr/channels/nixpkgs"))
   :bind (("M-x" . counsel-M-x)
          ("C-x C-f" . counsel-find-file)
          ("C-c g" . counsel-rg)
-         ("C-c o" . counsel-org-rg)
          ("C-c G" . counsel-git)
+         ("C-c o" . counsel-org-rg)
+         ("C-c l" . counsel-nixpkgs-rg)
+         ("C-c L" . counsel-nixpkgs-file)
          ("C-x b" . counsel-switch-buffer)
          ("C-c h" . counsel-minibuffer-history)
          ("M-y" . counsel-yank-pop)))
@@ -102,8 +112,7 @@
   :init
   (setq magit-repository-directories '(("~/src" . 1)))
   :bind (("C-x g" . magit-status)
-         ("C-c M-g" . magit-file-dispatch)
-         ("C-c l" . magit-list-repositories)))
+         ("C-c M-g" . magit-file-dispatch)))
 
 (use-package which-key
   :commands which-key-mode
