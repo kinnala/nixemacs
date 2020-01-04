@@ -1,6 +1,6 @@
 self: super: {
   tom = super.tom or {} // {
-    emacs = self.lowPrio self.emacs;
+    emacs = self.lowPrio self.emacs; # this also writes .desktop => lower priority
     emacs-custom-desktop = self.emacs-custom-desktop;
     nix = self.nix;
     conda = self.conda;
