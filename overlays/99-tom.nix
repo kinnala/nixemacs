@@ -1,6 +1,7 @@
 self: super: {
   tom = super.tom or {} // {
-    emacs = self.emacs;
+    emacs = self.lowPrio self.emacs;
+    emacs-custom-desktop = self.emacs-custom-desktop;
     nix = self.nix;
     conda = self.conda;
     slack = self.slack;
