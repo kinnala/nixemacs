@@ -51,9 +51,9 @@ installing 'xclip-0.13'
 #+end_example
 
 
-* Setting up a new computer
+* Setting up a new box
 
-This is a checklist for myself.
+This is a checklist for reinstalling my laptop.
 
 1. Install Ubuntu. Remember to encrypt hard drives.
 2. Install tools outside of Nix: dropbox, docker, vim, git, nix.
