@@ -1,6 +1,6 @@
 * Linux configuration files
 
-Contents of this file get tangled to $HOME directory via
+Contents of this file get tangled to $HOME via
 
 #+begin_src elisp :results verbatim
 (org-babel-tangle)
@@ -63,7 +63,7 @@ This is a checklist for myself.
 * Nix configuration
 
 Most of my software gets installed via Nix.  First, proprietary software is
-enabled via the following config.nix:
+enabled in config.nix:
 
 #+begin_src nix :mkdirp yes :tangle ~/.config/nixpkgs/config.nix
 { allowUnfree = true; }
@@ -93,8 +93,7 @@ self: super: {
 
 ** Emacs
 
-The package Emacs gets customized in the following overlay which defines also a
-derivation for the custom desktop-file (given below):
+The package "emacs" is customized in the following overlay:
 
 #+begin_src nix :mkdirp yes :tangle ~/.config/nixpkgs/overlays/01-emacs.nix
 self: super: {
@@ -695,7 +694,7 @@ region, down by N lines, or 1 line if N is nil."
 (load "~/Dropbox/Config/emacs/private.el" t)
 #+end_src
 
-The custom desktop-file unsets XMODIFIERS due to an issue with deadkeys:
+This custom desktop-file unsets XMODIFIERS due to an issue with deadkeys:
 
 #+begin_src :mkdirp yes :tangle ~/.config/nixpkgs/overlays/emacs/emacs.desktop
 [Desktop Entry]
