@@ -1,51 +1,100 @@
-* Laptop configuration
+* Linux configuration files
 
+Contents of this file get tangled to $HOME directory via
+
+#+begin_src elisp :results verbatim
+(org-babel-tangle)
+#+end_src
+
+#+RESULTS:
+: ("~/.config/nixpkgs/overlays/emacs/emacs.desktop" "~/.config/nixpkgs/overlays/emacs/init.el" "~/.config/nixpkgs/overlays/01-emacs.nix" "~/.config/nixpkgs/overlays/99-tom.nix" "~/.config/nixpkgs/config.nix")
+
+This exports all configuration files such as:
+- $HOME/.config/nixpkgs/config.nix
+- $HOME/.config/nixpkgs/overlays/*
+- $HOME/.profile
+
+Next the Nix user environment gets populated by running
+
+#+begin_src sh :results verbatim
+nix-env -iA nixpkgs.tom
+#+end_src
+
+#+RESULTS:
+#+begin_example
+replacing old 'conda-shell'
+replacing old 'emacs-with-packages-26.3'
+replacing old 'emacs-custom-desktop'
+replacing old 'gmsh-4.4.1'
+replacing old 'gnumake-4.2.1'
+replacing old 'gnupg-2.2.19'
+replacing old 'htop-2.2.0'
+replacing old 'nix-2.3.1'
+replacing old 'password-store-1.7.3'
+replacing old 'ripgrep-11.0.2'
+replacing old 'slack-4.2.0'
+replacing old 'suitesparse-5.4.0'
+replacing old 'xclip-0.13'
+installing 'conda-shell'
+installing 'emacs-with-packages-26.3'
+installing 'emacs-custom-desktop'
+installing 'gmsh-4.4.1'
+installing 'gnumake-4.2.1'
+installing 'gnupg-2.2.19'
+installing 'htop-2.2.0'
+installing 'nix-2.3.1'
+installing 'password-store-1.7.3'
+installing 'ripgrep-11.0.2'
+installing 'slack-4.2.0'
+installing 'suitesparse-5.4.0'
+installing 'xclip-0.13'
+#+end_example
 
 
 * Setting up a new computer
 
-** Install Ubuntu
+This is a checklist for myself.
 
-Remember to encrypt hard drives.
-
-** Install software
-
-- dropbox
-- docker
-- git
-- nix
-
-** Create symlink $HOME/.gnupg
-
-* Profile
-
-#+begin_src :tangle ~/.profile
-if [ -n "$BASH_VERSION" ]; then
-    if [ -f "$HOME/.bashrc" ]; then
-	. "$HOME/.bashrc"
-    fi
-fi
-
-if [ -d "$HOME/bin" ] ; then
-    PATH="$HOME/bin:$PATH"
-fi
-
-if [ -d "$HOME/.local/bin" ] ; then
-    PATH="$HOME/.local/bin:$PATH"
-fi
-
-if [ -e /home/tom/.nix-profile/etc/profile.d/nix.sh ]; then . /home/tom/.nix-profile/etc/profile.d/nix.sh; fi
-
-export XDG_DATA_DIRS=$HOME/.nix-profile/share:$HOME/.share:"${XDG_DATA_DIRS:-/usr/local/share/:/usr/share/}"
-export PASSWORD_STORE_DIR=$HOME/Dropbox/Config/.password-store
-#+end_src
+1. Install Ubuntu. Remember to encrypt hard drives.
+2. Install tools outside of Nix: dropbox, docker, vim, git, nix.
+3. Symlink $HOME/.gnupg.
+4. Tangle this file using a temporary nix-shell environment.
 
 * Nix configuration
 
+Most of my software gets installed via Nix.  First, proprietary software is
+enabled via the following config.nix:
 
 #+begin_src nix :mkdirp yes :tangle ~/.config/nixpkgs/config.nix
 { allowUnfree = true; }
 #+end_src
+
+Next, the list of packages gets defined in the following overlay:
+
+#+begin_src nix :mkdirp yes :tangle ~/.config/nixpkgs/overlays/99-tom.nix
+self: super: {
+  tom = super.tom or {} // {
+    emacs = self.lowPrio self.emacs; # emacs also writes .desktop => set lower priority
+    emacs-custom-desktop = self.emacs-custom-desktop;
+    nix = self.nix;
+    conda = self.conda;
+    slack = self.slack;
+    gnupg = self.gnupg;
+    pass = self.pass;
+    ripgrep = self.ripgrep;
+    htop = self.htop;
+    gmsh = self.gmsh;
+    suitesparse = self.suitesparse;
+    gnumake = self.gnumake;
+    xclip = self.xclip;
+  };
+}
+#+end_src
+
+** Emacs
+
+The package Emacs gets customized in the following overlay which defines also a
+derivation for the custom desktop-file (given below):
 
 #+begin_src nix :mkdirp yes :tangle ~/.config/nixpkgs/overlays/01-emacs.nix
 self: super: {
@@ -99,26 +148,7 @@ self: super: {
 }
 #+end_src
 
-#+begin_src nix :mkdirp yes :tangle ~/.config/nixpkgs/overlays/99-tom.nix
-self: super: {
-  tom = super.tom or {} // {
-    emacs = self.lowPrio self.emacs; # this also writes .desktop => lower priority
-    emacs-custom-desktop = self.emacs-custom-desktop;
-    nix = self.nix;
-    conda = self.conda;
-    slack = self.slack;
-    gnupg = self.gnupg;
-    pass = self.pass;
-    ripgrep = self.ripgrep;
-    htop = self.htop;
-    gmsh = self.gmsh;
-    suitesparse = self.suitesparse;
-    gnumake = self.gnumake;
-    xclip = self.xclip;
-  };
-}
-#+end_src
-
+The above configuration is based on the following Emacs init-file:
 
 #+begin_src elisp :mkdirp yes :tangle ~/.config/nixpkgs/overlays/emacs/init.el
 (require 'package)
@@ -665,6 +695,7 @@ region, down by N lines, or 1 line if N is nil."
 (load "~/Dropbox/Config/emacs/private.el" t)
 #+end_src
 
+The custom desktop-file unsets XMODIFIERS due to an issue with deadkeys:
 
 #+begin_src :mkdirp yes :tangle ~/.config/nixpkgs/overlays/emacs/emacs.desktop
 [Desktop Entry]
@@ -681,6 +712,28 @@ StartupWMClass=Emacs
 Keywords=Text;Editor;
 #+end_src
 
-#+begin_src sh
-nix-env -iAr nixpkgs.tom
+* Profile file
+
+Contains some additional environment variables.
+
+#+begin_src :tangle ~/.profile
+if [ -n "$BASH_VERSION" ]; then
+    if [ -f "$HOME/.bashrc" ]; then
+	. "$HOME/.bashrc"
+    fi
+fi
+
+if [ -d "$HOME/bin" ] ; then
+    PATH="$HOME/bin:$PATH"
+fi
+
+if [ -d "$HOME/.local/bin" ] ; then
+    PATH="$HOME/.local/bin:$PATH"
+fi
+
+if [ -e /home/tom/.nix-profile/etc/profile.d/nix.sh ]; then . /home/tom/.nix-profile/etc/profile.d/nix.sh; fi
+
+export XDG_DATA_DIRS=$HOME/.nix-profile/share:$HOME/.share:"${XDG_DATA_DIRS:-/usr/local/share/:/usr/share/}"
+export PASSWORD_STORE_DIR=$HOME/Dropbox/Config/.password-store
 #+end_src
+
