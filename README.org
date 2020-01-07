@@ -23,7 +23,7 @@ This is a checklist for reinstalling my laptop.
 
 1. Install Ubuntu. Remember to encrypt hard drives.
 2. Install tools outside of Nix: dropbox, docker, vim, git, nix.
-3. Symlink $HOME/.gnupg.
+3. Symlink $HOME/.gnupg and $HOME/.profile.
 4. Tangle this file using a temporary nix-shell environment.
 
 * Nix configuration
@@ -677,29 +677,3 @@ Categories=Development;TextEditor;
 StartupWMClass=Emacs
 Keywords=Text;Editor;
 #+end_src
-
-* Profile file
-
-Contains some additional environment variables.
-
-#+begin_src :tangle ~/.profile
-if [ -n "$BASH_VERSION" ]; then
-    if [ -f "$HOME/.bashrc" ]; then
-	. "$HOME/.bashrc"
-    fi
-fi
-
-if [ -d "$HOME/bin" ] ; then
-    PATH="$HOME/bin:$PATH"
-fi
-
-if [ -d "$HOME/.local/bin" ] ; then
-    PATH="$HOME/.local/bin:$PATH"
-fi
-
-if [ -e /home/tom/.nix-profile/etc/profile.d/nix.sh ]; then . /home/tom/.nix-profile/etc/profile.d/nix.sh; fi
-
-export XDG_DATA_DIRS=$HOME/.nix-profile/share:$HOME/.share:"${XDG_DATA_DIRS:-/usr/local/share/:/usr/share/}"
-export PASSWORD_STORE_DIR=$HOME/Dropbox/Config/.password-store
-#+end_src
-
