@@ -53,6 +53,7 @@ self: super: {
     suitesparse = self.suitesparse;
     gnumake = self.gnumake;
     xclip = self.xclip;
+    graphviz = self.graphviz;
   };
 }
 #+end_src
