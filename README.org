@@ -11,7 +11,7 @@ This exports all configuration files such as:
 - $HOME/.config/nixpkgs/overlays/*
 - $HOME/.profile
 
-Next the Nix user environment gets populated by running
+The Nix user environment gets populated by running
 
 #+begin_src sh :results output silent
 nix-env -iAr nixpkgs.tom
@@ -22,7 +22,7 @@ nix-env -iAr nixpkgs.tom
 This is a checklist for reinstalling my laptop.
 
 1. Install Ubuntu. Remember to encrypt hard drives.
-2. Install tools outside of Nix: dropbox, docker, vim, git, nix.
+2. Install tools outside of Nix: dropbox, docker, nix.
 3. Symlink $HOME/.gnupg and $HOME/.profile.
 4. Tangle this file using a temporary nix-shell environment.
 
@@ -55,6 +55,7 @@ self: super: {
     xclip = self.xclip;
     graphviz = self.graphviz;
     git = self.git;
+    vim = self.vim;
   };
 }
 #+end_src
