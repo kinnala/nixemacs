@@ -2,12 +2,9 @@
 
 Contents of this file get tangled to $HOME via
 
-#+begin_src elisp :results verbatim
+#+begin_src elisp :results output silent
 (org-babel-tangle)
 #+end_src
-
-#+RESULTS:
-: ("~/.config/nixpkgs/overlays/emacs/emacs.desktop" "~/.config/nixpkgs/overlays/emacs/init.el" "~/.config/nixpkgs/overlays/01-emacs.nix" "~/.config/nixpkgs/overlays/99-tom.nix" "~/.config/nixpkgs/config.nix")
 
 This exports all configuration files such as:
 - $HOME/.config/nixpkgs/config.nix
@@ -16,40 +13,9 @@ This exports all configuration files such as:
 
 Next the Nix user environment gets populated by running
 
-#+begin_src sh :results verbatim
+#+begin_src sh :results output silent
 nix-env -iA nixpkgs.tom
 #+end_src
-
-#+RESULTS:
-#+begin_example
-replacing old 'conda-shell'
-replacing old 'emacs-with-packages-26.3'
-replacing old 'emacs-custom-desktop'
-replacing old 'gmsh-4.4.1'
-replacing old 'gnumake-4.2.1'
-replacing old 'gnupg-2.2.19'
-replacing old 'htop-2.2.0'
-replacing old 'nix-2.3.1'
-replacing old 'password-store-1.7.3'
-replacing old 'ripgrep-11.0.2'
-replacing old 'slack-4.2.0'
-replacing old 'suitesparse-5.4.0'
-replacing old 'xclip-0.13'
-installing 'conda-shell'
-installing 'emacs-with-packages-26.3'
-installing 'emacs-custom-desktop'
-installing 'gmsh-4.4.1'
-installing 'gnumake-4.2.1'
-installing 'gnupg-2.2.19'
-installing 'htop-2.2.0'
-installing 'nix-2.3.1'
-installing 'password-store-1.7.3'
-installing 'ripgrep-11.0.2'
-installing 'slack-4.2.0'
-installing 'suitesparse-5.4.0'
-installing 'xclip-0.13'
-#+end_example
-
 
 * Setting up a new box
 
@@ -203,6 +169,7 @@ The above configuration is based on the following Emacs init-file:
                                    ("begin" "$1" "$" "$$" "\\(" "\\["))
         org-src-preserve-indentation t
         org-confirm-babel-evaluate nil
+        org-html-validation-link nil
         python-shell-completion-native-disabled-interpreters '("python")
         org-babel-default-header-args:sh '((:prologue . "exec 2>&1")
                                            (:epilogue . ":"))
@@ -347,7 +314,7 @@ The above configuration is based on the following Emacs init-file:
   (set-face-attribute
    'diredfl-read-priv nil :foreground "#000000" :background "#DDFFDD")
   (set-face-attribute
-   'diredfl-exec-priv nil :foreground "#000000" :background "#DDDDDFF")
+   'diredfl-exec-priv nil :foreground "#000000" :background "#DDDDFF")
   (set-face-attribute 'mode-line nil
                       :font "Ubuntu Mono-12"
                       :background "#555"
