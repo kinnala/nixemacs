@@ -1,4 +1,4 @@
-* Linux configuration files
+* Nix and Emacs configuration
 
 Contents of this file get tangled to $HOME via
 
