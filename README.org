@@ -6,12 +6,8 @@ Contents of this file get tangled to $HOME via
 (org-babel-tangle)
 #+end_src
 
-This exports all configuration files such as:
-- $HOME/.config/nixpkgs/config.nix
-- $HOME/.config/nixpkgs/overlays/*
-- $HOME/.profile
-
-The Nix user environment gets populated by running
+This exports all configuration files under $HOME/.config/nixpkgs/.  The Nix user
+environment gets populated by running
 
 #+begin_src sh :results output silent
 nix-env -iAr nixpkgs.tom
