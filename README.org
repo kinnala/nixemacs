@@ -303,7 +303,7 @@ The above configuration is based on the following Emacs init-file:
   (set-face-attribute
    'term nil :foreground "#000000" :background "#DDFFFF")
   (set-face-attribute
-   'hl-line nil :background "#ffebfe")
+   'hl-line nil :background "#ffffff")
   (set-face-attribute
    'diredfl-compressed-file-suffix nil :foreground "#000000")
   (set-face-attribute
