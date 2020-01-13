@@ -96,6 +96,7 @@ self: super: {
       ob-restclient
       htmlize
       diredfl
+      markdown-mode
       python-pytest
       dired-k
       nix-mode
@@ -401,6 +402,11 @@ The above configuration is based on the following Emacs init-file:
     (interactive)
     (ivy-pass)))
 
+(use-package markdown-mode
+  :commands (markdown-mode)
+  :mode (("\\.md\\'" . markdown-mode)
+         ("\\.markdown\\'" . markdown-mode)))
+
 ;; move lines, from https://github.com/kinnala/move-lines
 
 (defun move-lines--internal (n)
@@ -605,7 +611,7 @@ region, down by N lines, or 1 line if N is nil."
 (global-display-line-numbers-mode)
 
 ;; browse in chrome
-(setq browse-url-browser-function 'browse-url-chromium)
+(setq browse-url-browser-function 'browse-url-chrome)
 
 ;; don't fontify latex
 (setq font-latex-fontify-script nil)
