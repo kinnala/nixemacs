@@ -52,6 +52,7 @@ self: super: {
     graphviz = self.graphviz;
     git = self.git;
     vim = self.vim;
+    pandoc = self.pandoc;
   };
 }
 #+end_src
