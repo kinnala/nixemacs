@@ -286,6 +286,13 @@ The above configuration is based on the following Emacs init-file:
   (defun run-gnome-terminal-here ()
     (interactive)
     (shell-command "gnome-terminal"))
+  (setq dired-guess-shell-alist-user
+        '(("\\.pdf\\'" "evince")
+          ("\\.eps\\'" "evince")
+          ("\\.jpe?g\\'" "eog")
+          ("\\.png\\'" "eog")
+          ("\\.gif\\'" "eog")
+          ("\\.xpm\\'" "eog")))
   :bind (("C-x C-j" . dired-jump))
   :bind (:map dired-mode-map
               ("'" . run-gnome-terminal-here)
@@ -389,7 +396,16 @@ The above configuration is based on the following Emacs init-file:
               ("g" . dired-k)))
 
 (use-package anaconda-mode
+  :after exec-path-from-shell
+  :commands (pythonic-activate pythonic-deactivate)
   :init
+  (defun activate (virtualenv)
+    "Activate a virtual environment so that pytest recognizes it."
+    (interactive "DEnv: ")
+    (pythonic-activate virtualenv)
+    (exec-path-from-shell-setenv
+     "PATH"
+     (string-join (python-shell-calculate-exec-path) ":")))
   (add-hook 'python-mode-hook 'anaconda-mode)
   (add-hook 'python-mode-hook 'anaconda-eldoc-mode))
 
