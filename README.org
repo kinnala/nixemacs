@@ -100,6 +100,7 @@ self: super: {
       markdown-mode
       python-pytest
       dired-k
+      moe-theme
       nix-mode
       anaconda-mode
       ivy-pass
@@ -301,57 +302,51 @@ The above configuration is based on the following Emacs init-file:
 
 (use-package json-mode)
 
-(use-package leuven-theme
-  :after diredfl
+(use-package moe-theme
+  :commands moe-light
   :init
-  (load-theme 'leuven t)
+  (setq moe-theme-resize-markdown-title '(2.0 1.7 1.5 1.3 1.0 1.0))
+  (setq moe-theme-resize-org-title '(2.2 1.8 1.6 1.4 1.2 1.0 1.0 1.0 1.0))
+  (setq moe-theme-resize-rst-title '(2.0 1.7 1.5 1.3 1.1 1.0))
+  (put 'diredp-tagged-autofile-name 'face-alias 'diredfl-tagged-autofile-name)
+  (put 'diredp-autofile-name 'face-alias 'diredfl-autofile-name)
+  (put 'diredp-ignored-file-name 'face-alias 'diredfl-ignored-file-name)
+  (put 'diredp-symlink 'face-alias 'diredfl-symlink)
+  (put 'diredp-compressed-file-name 'face-alias 'diredfl-compressed-file-name)
+  (put 'diredp-file-suffix 'face-alias 'diredfl-file-suffix)
+  (put 'diredp-compressed-extensions 'face-alias 'diredfl-compressed-extensions)
+  (put 'diredp-deletion 'face-alias 'diredfl-deletion)
+  (put 'diredp-deletion-file-name 'face-alias 'diredfl-deletion-file-name)
+  (put 'diredp-flag-mark-line 'face-alias 'diredfl-flag-mark-line)
+  (put 'diredp-rare-priv 'face-alias 'diredfl-rare-priv)
+  (put 'diredp-number 'face-alias 'diredfl-number)
+  (put 'diredp-exec-priv 'face-alias 'diredfl-exec-priv)
+  (put 'diredp-file-name 'face-alias 'diredfl-file-name)
+  (put 'diredp-dir-heading 'face-alias 'diredfl-dir-heading)
+  (put 'diredp-compressed-file-suffix 'face-alias 'diredfl-compressed-file-suffix)
+  (put 'diredp-flag-mark 'face-alias 'diredfl-flag-mark)
+  (put 'diredp-mode-set-explicitly 'face-alias 'diredfl-mode-set-explicitly)
+  (put 'diredp-executable-tag 'face-alias 'diredfl-executable-tag)
+  (put 'diredp-global-mode-hook 'face-alias 'diredfl-global-mode-hook)
+  (put 'diredp-ignore-compressed-flag 'face-alias 'diredfl-ignore-compressed-flag)
+  (put 'diredp-dir-priv 'face-alias 'diredfl-dir-priv)
+  (put 'diredp-date-time 'face-alias 'diredfl-date-time)
+  (put 'diredp-other-priv 'face-alias 'diredfl-other-priv)
+  (put 'diredp-no-priv 'face-alias 'diredfl-no-priv)
+  (put 'diredp-link-priv 'face-alias 'diredfl-link-priv)
+  (put 'diredp-write-priv 'face-alias 'diredfl-write-priv)
+  (put 'diredp-global-mode-buffers 'face-alias 'diredfl-global-mode-buffers)
+  (put 'dired-directory 'face-alias 'diredfl-dir-name)
+  (put 'diredp-read-priv 'face-alias 'diredfl-read-priv)
   (global-hl-line-mode)
-  (set-face-attribute 'font-lock-type-face nil :box 1)
-  (set-face-attribute 'font-lock-function-name-face nil :box 1)
-  (set-face-attribute 'font-lock-constant-face nil :box 1)
-  (set-face-attribute
-   'term nil :foreground "#000000" :background "#DDFFFF")
-  (set-face-attribute
-   'hl-line nil :background "#ffffff")
-  (set-face-attribute
-   'diredfl-compressed-file-suffix nil :foreground "#000000")
-  (set-face-attribute
-   'diredfl-dir-name nil :foreground "#000000" :background "#FFDDDD" :box nil)
-  (set-face-attribute
-   'diredfl-dir-heading nil :foreground "#000000" :background "#FFDDDD")
-  (set-face-attribute
-   'diredfl-write-priv nil :foreground "#000000" :background "#FFDDDD")
-  (set-face-attribute
-   'diredfl-read-priv nil :foreground "#000000" :background "#DDFFDD")
-  (set-face-attribute
-   'diredfl-exec-priv nil :foreground "#000000" :background "#DDDDFF")
-  (set-face-attribute 'mode-line nil
-                      :font "Ubuntu Mono-12"
-                      :background "#777"
-                      :foreground "#FFF")
-  (set-face-attribute 'mode-line-inactive nil :font "Ubuntu Mono-12")
-  (set-face-attribute 'default nil :font "Ubuntu Mono-14")
-  (setq initial-frame-alist
-        '((mouse-color           . "midnightblue")
-          (foreground-color      . "grey20")
-          (background-color      . "FloralWhite")
-          (internal-border-width . 2)
-          (line-spacing          . 1)
-          (top . 20) (left . 650) (width . 88) (height . 26)))
-  (setq default-frame-alist
-        '((border-color          . "#4e3832")
-          (foreground-color      . "grey10")
-          (background-color      . "FloralWhite")
-          (cursor-color          . "purple")
-          (cursor-type           . box)
-          (top . 30) (left . 150) (width . 88) (height . 26))))
+  (moe-light))
 
 (use-package highlight-indentation
   :init
-  (defun set-hl-indent-color ()
-    (set-face-background 'highlight-indentation-face "#ededdc"))
-  (add-hook 'prog-mode-hook 'highlight-indentation-mode)
-  (add-hook 'prog-mode-hook 'set-hl-indent-color))
+  ;; (defun set-hl-indent-color ()
+  ;;   (set-face-background 'highlight-indentation-face "#9e9e9e"))
+  (add-hook 'prog-mode-hook 'highlight-indentation-mode))
+;;  (add-hook 'prog-mode-hook 'set-hl-indent-color))
 
 (use-package yaml-mode)
 
@@ -397,7 +392,10 @@ The above configuration is based on the following Emacs init-file:
 
 (use-package anaconda-mode
   :after exec-path-from-shell
-  :commands (pythonic-activate pythonic-deactivate)
+  :commands (pythonic-activate
+             pythonic-deactivate
+             anaconda-
+             anaconda-eldoc-mode)
   :init
   (defun activate (virtualenv)
     "Activate a virtual environment so that pytest recognizes it."
@@ -571,6 +569,11 @@ region, down by N lines, or 1 line if N is nil."
 
 ;; windmove
 (windmove-default-keybindings)
+
+;; fonts
+(set-face-attribute 'mode-line-inactive nil :font "Ubuntu Mono-12")
+(set-face-attribute 'default nil :font "Ubuntu Mono-14")
+(set-face-attribute 'mode-line nil :font "Ubuntu Mono-12")
 
 ;; disable tool and menu bars
 (tool-bar-mode -1)
