@@ -343,10 +343,7 @@ The above configuration is based on the following Emacs init-file:
 
 (use-package highlight-indentation
   :init
-  ;; (defun set-hl-indent-color ()
-  ;;   (set-face-background 'highlight-indentation-face "#9e9e9e"))
   (add-hook 'prog-mode-hook 'highlight-indentation-mode))
-;;  (add-hook 'prog-mode-hook 'set-hl-indent-color))
 
 (use-package yaml-mode)
 
