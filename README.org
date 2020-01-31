@@ -542,7 +542,7 @@ region, down by N lines, or 1 line if N is nil."
 
 ;; fonts
 (set-face-attribute 'mode-line-inactive nil :font "Ubuntu Mono-12")
-(set-face-attribute 'default nil :font "Ubuntu Mono-14")
+(set-face-attribute 'default nil :font "Ubuntu Mono-16")
 (set-face-attribute 'mode-line nil :font "Ubuntu Mono-12")
 
 ;; disable tool and menu bars
