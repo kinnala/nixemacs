@@ -36,7 +36,7 @@ Next, the list of packages gets defined in the following overlay:
 #+begin_src nix :mkdirp yes :tangle ~/.config/nixpkgs/overlays/99-tom.nix
 self: super: {
   tom = super.tom or {} // {
-    emacs = self.lowPrio self.emacs; # emacs also writes .desktop => set lower priority
+    emacsGit = self.lowPrio self.emacsGit; # emacs also writes .desktop => set lower priority
     emacs-custom-desktop = self.emacs-custom-desktop;
     nix = self.nix;
     conda = self.conda;
@@ -59,11 +59,17 @@ self: super: {
 
 ** Emacs
 
-The package "emacs" is customized in the following overlay:
+Use bleeding edge Emacs.
 
-#+begin_src nix :mkdirp yes :tangle ~/.config/nixpkgs/overlays/01-emacs.nix
+#+begin_src nix :mkdirp yes :tangle ~/.config/nixpkgs/overlays/01-emacs27.nix
+import (builtins.fetchTarball {
+      url = "https://github.com/nix-community/emacs-overlay/archive/86707a04d9679a92b7454e073a13e0c676e59e6d.tar.gz";
+      sha256 = "1x3l0iypc1zchm364axp66m70jjik4pl413lrwj37w320gv23fh5";
+})
+#+end_src
+
+#+begin_src nix :mkdirp yes :tangle ~/.config/nixpkgs/overlays/02-emacs.nix
 self: super: {
-  emacs-config = self.writeText "default.el" (builtins.readFile ./emacs/init.el);
   emacs-custom-desktop = with self; stdenv.mkDerivation {
     name = "emacs-custom-desktop";
     src = ./emacs;
@@ -73,51 +79,16 @@ self: super: {
       cp emacs.desktop $out/share/applications
     '';
   };
-  emacs = self.emacsWithPackages (epkgs: (with epkgs.melpaPackages;
-    [
-      use-package
-      hydra
-      ivy
-      counsel
-      swiper
-      transient
-      magit
-      which-key
-      exec-path-from-shell
-      expand-region
-      multiple-cursors
-      json-mode
-      leuven-theme
-      highlight-indentation
-      yaml-mode
-      wgrep
-      phi-search
-      docker
-      restclient
-      ob-restclient
-      htmlize
-      diredfl
-      markdown-mode
-      python-pytest
-      dired-k
-      moe-theme
-      nix-mode
-      anaconda-mode
-      ivy-pass
-    ]) ++ (with epkgs.elpaPackages; [
-      csv-mode
-      org
-    ]) ++ [(self.runCommand "default.el" {} ''
-      mkdir -p $out/share/emacs/site-lisp
-      cp ${self.emacs-config} $out/share/emacs/site-lisp/default.el
-    '')]
-  );
+  emacsGit = (self.emacsWithPackagesFromUsePackage {
+      config = builtins.readFile ~/.config/emacs/init.el;
+      package = super.emacsGit;
+  });
 }
 #+end_src
 
 The above configuration is based on the following Emacs init-file:
 
-#+begin_src elisp :mkdirp yes :tangle ~/.config/nixpkgs/overlays/emacs/init.el
+#+begin_src elisp :mkdirp yes :tangle ~/.config/emacs/init.el
 (require 'package)
 (package-initialize 'noactivate)
 (eval-when-compile
@@ -275,11 +246,13 @@ The above configuration is based on the following Emacs init-file:
   (define-key global-map (kbd "C-,") 'mc/mark-next-like-this)
   (define-key global-map (kbd "C-;") 'mc/mark-all-dwim))
 
-(use-package term)
+(defalias 'use-internal-package 'use-package)
 
-(use-package dired-x)
+(use-internal-package term)
 
-(use-package dired
+(use-internal-package dired-x)
+
+(use-internal-package dired
   :after (term dired-x)
   :init
   (setq dired-dwim-target t)
@@ -598,6 +571,7 @@ region, down by N lines, or 1 line if N is nil."
 
 ;; highlight parenthesis, easier jumping with C-M-n/p
 (show-paren-mode 1)
+(setq show-paren-style 'expression)
 (setq show-paren-delay 0)
 
 ;; control indentation
