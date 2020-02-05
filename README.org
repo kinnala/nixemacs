@@ -99,12 +99,19 @@ The above configuration is based on the following Emacs init-file:
   :config
   (unbind-key "C-," org-mode-map)
   :init
-  (add-hook 'org-mode-hook (lambda () (org-babel-do-load-languages
-                                       'org-babel-load-languages '((python . t)
-                                                                   (shell . t)))))
+  (add-hook 'org-mode-hook (lambda ()
+                             (fset 'tex-font-lock-suscript 'ignore)
+                             (org-babel-do-load-languages
+                              'org-babel-load-
+                              '((python . t)
+                                (shell . t)))))
   (add-hook 'org-agenda-finalize-hook
             (lambda ()
               (save-excursion
+                (set-face-attribute 'org-agenda-structure nil :height (car moe-theme-resize-org-title))
+                (set-face-attribute 'org-agenda-date nil :height (cadr moe-theme-resize-org-title))
+                (set-face-attribute 'org-agenda-date-today nil :height (cadr moe-theme-resize-org-title))
+                (set-face-attribute 'org-agenda-date-weekend nil :height (cadr moe-theme-resize-org-title))
                 (color-org-header "inbox:" "#DDDDFF" "black")
                 (color-org-header "work:" "#FFDDDD" "red")
                 (color-org-header "research:" "#DDFFDD" "DarkGreen"))))
@@ -116,6 +123,7 @@ The above configuration is based on the following Emacs init-file:
       (add-text-properties
        (match-beginning 0) (+ (match-beginning 0) 10)
        `(face (:background, backcolor, :foreground, forecolor)))))
+  (fset 'tex-font-lock-suscript 'ignore)
   (setq org-default-notes-file "~/Dropbox/Notes/gtd/inbox.org"
         org-agenda-files '("~/Dropbox/Notes/gtd/inbox.org"
                            "~/Dropbox/Notes/gtd/tickler.org"
@@ -130,6 +138,16 @@ The above configuration is based on the following Emacs init-file:
         org-export-babel-evaluate nil
         org-adapt-indentation nil
         org-refile-use-outline-path 'file
+        org-structure-template-alist '(("a" . "export ascii")
+                                       ("c" . "center")
+                                       ("C" . "comment")
+                                       ("e" . "example")
+                                       ("E" . "export")
+                                       ("h" . "export html")
+                                       ("l" . "latex latex")
+                                       ("q" . "quote")
+                                       ("s" . "src")
+                                       ("v" . "verse"))
         org-outline-path-complete-in-steps nil
         org-duration-format '(("d" . nil) ("h" . t) (special . 2))
         org-format-latex-options '(:foreground default
@@ -278,6 +296,7 @@ The above configuration is based on the following Emacs init-file:
 (use-package moe-theme
   :commands moe-light
   :init
+  (require 'org)
   (setq moe-theme-resize-markdown-title '(2.0 1.7 1.5 1.3 1.0 1.0))
   (setq moe-theme-resize-org-title '(2.2 1.8 1.6 1.4 1.2 1.0 1.0 1.0 1.0))
   (setq moe-theme-resize-rst-title '(2.0 1.7 1.5 1.3 1.1 1.0))
