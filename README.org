@@ -293,6 +293,8 @@ The above configuration is based on the following Emacs init-file:
 
 (use-package json-mode)
 
+(use-package julia-mode)
+
 (use-package moe-theme
   :commands moe-light
   :init
@@ -366,6 +368,8 @@ The above configuration is based on the following Emacs init-file:
    'org-babel-load-languages '((restclient . t))))
 
 (use-package htmlize)
+
+(use-package org-ref)
 
 (use-package diredfl
   :commands diredfl-global-mode
@@ -671,6 +675,10 @@ region, down by N lines, or 1 line if N is nil."
   (lambda () (interactive)
     (tom/select-frame 3)))
 
+;; bind find config
+(define-key global-map (kbd "<f10>")
+  (lambda () (interactive)
+    (find-file "~/Dropbox/Config/nixpkgs/README.org")))
 ;; bind compile
 (define-key global-map (kbd "<f12>") 'compile)
 
