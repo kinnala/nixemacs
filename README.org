@@ -96,8 +96,6 @@ self: super: {
 
 ** Emacs configuration
 
-I'm heavy user of use-package macros that group related commands.
-
 #+begin_src elisp :mkdirp yes :tangle ~/.config/emacs/init.el
 (require 'package)
 (package-initialize 'noactivate)
@@ -105,7 +103,7 @@ I'm heavy user of use-package macros that group related commands.
   (require 'use-package))
 #+end_src
 
-*** org-mode
+*** Org-mode
 
 #+begin_src elisp :mkdirp yes :tangle ~/.config/emacs/init.el
 (use-package org
@@ -152,16 +150,8 @@ I'm heavy user of use-package macros that group related commands.
         org-export-babel-evaluate nil
         org-adapt-indentation nil
         org-refile-use-outline-path 'file
-        org-structure-template-alist '(("a" . "export ascii")
-                                       ("c" . "center")
-                                       ("C" . "comment")
-                                       ("e" . "example")
-                                       ("E" . "export")
-                                       ("h" . "export html")
-                                       ("l" . "latex latex")
-                                       ("q" . "quote")
-                                       ("s" . "src")
-                                       ("v" . "verse"))
+        org-structure-template-alist '(("l" . "latex latex")
+                                       ("s" . "src"))
         org-outline-path-complete-in-steps nil
         org-duration-format '(("d" . nil) ("h" . t) (special . 2))
         org-format-latex-options '(:foreground default
@@ -186,9 +176,11 @@ I'm heavy user of use-package macros that group related commands.
                                  "* %?\n%t")))
   :bind (("C-c c" . org-capture)
          ("C-c a" . org-agenda)))
+#+end_src
 
-(use-package hydra)
+*** Find, select and modify: ivy/counsel/swiper and wgrep
 
+#+begin_src elisp :mkdirp yes :tangle ~/.config/emacs/init.el
 (use-package ivy
   :commands
   ivy-mode
@@ -230,22 +222,24 @@ I'm heavy user of use-package macros that group related commands.
 (use-package swiper
   :bind ("C-c s" . swiper))
 
-(use-package transient)
+(use-package wgrep)
+#+end_src
 
+*** Magit
+
+#+begin_src elisp :mkdirp yes :tangle ~/.config/emacs/init.el
 (use-package magit
   :init
   (setq magit-repository-directories '(("~/src" . 1)))
   :bind (("C-x g" . magit-status)
          ("C-c M-g" . magit-file-dispatch)))
+#+end_src
 
-(use-package which-key
-  :commands which-key-mode
-  :init (which-key-mode))
+*** Multiline editing
 
-(use-package exec-path-from-shell
-  :commands exec-path-from-shell-initialize
-  :init (exec-path-from-shell-initialize))
+This triplet of packages allows doing magical things.
 
+#+begin_src elisp :mkdirp yes :tangle ~/.config/emacs/init.el
 (use-package expand-region
   :bind ("C-." . er/expand-region)
   :init
@@ -278,6 +272,18 @@ I'm heavy user of use-package macros that group related commands.
   (define-key global-map (kbd "C-,") 'mc/mark-next-like-this)
   (define-key global-map (kbd "C-;") 'mc/mark-all-dwim))
 
+(use-package phi-search
+  :after multiple-cursors
+  :init (require 'phi-replace)
+  :bind ("C-:" . phi-replace)
+  :bind (:map mc/keymap
+              ("C-s" . phi-search)
+              ("C-r" . phi-search-backward)))
+#+end_src
+
+*** Customizations to dired
+
+#+begin_src elisp :mkdirp yes :tangle ~/.config/emacs/init.el
 (defalias 'use-internal-package 'use-package)
 
 (use-internal-package term)
@@ -305,10 +311,43 @@ I'm heavy user of use-package macros that group related commands.
               ("j" . swiper)
               ("s" . swiper)))
 
+(use-package dired-k
+  :after (dired)
+  :bind (:map dired-mode-map
+              ("g" . dired-k)))
+
+(use-package diredfl
+  :commands diredfl-global-mode
+  :init (diredfl-global-mode))
+#+end_src
+
+*** Additional syntax highlighting
+
+#+begin_src elisp :mkdirp yes :tangle ~/.config/emacs/init.el
 (use-package json-mode)
 
 (use-package julia-mode)
 
+(use-package highlight-indentation
+  :init (add-hook 'prog-mode-hook 'highlight-indentation-mode))
+
+(use-package yaml-mode)
+
+(use-package csv-mode
+  :mode "\\.csv$"
+  :init (setq csv-separators '(";")))
+
+(use-package markdown-mode
+  :commands (markdown-mode)
+  :mode (("\\.md\\'" . markdown-mode)
+         ("\\.markdown\\'" . markdown-mode)))
+
+(use-package nix-mode)
+#+end_src
+
+*** Emacs theme
+
+#+begin_src elisp :mkdirp yes :tangle ~/.config/emacs/init.el
 (use-package moe-theme
   :commands moe-light
   :init
@@ -348,60 +387,18 @@ I'm heavy user of use-package macros that group related commands.
   (put 'diredp-read-priv 'face-alias 'diredfl-read-priv)
   (global-hl-line-mode)
   (moe-light))
+#+end_src
 
-(use-package highlight-indentation
-  :init
-  (add-hook 'prog-mode-hook 'highlight-indentation-mode))
+*** Python development
 
-(use-package yaml-mode)
+My current Python workflow is fairly old school and it's complemented by
+=counsel-rg= and =counsel-git=.
 
-(use-package wgrep)
-
-(use-package csv-mode
-  :mode "\\.csv$"
-  :init
-  (setq csv-separators '(";")))
-
-(use-package phi-search
-  :after multiple-cursors
-  :init (require 'phi-replace)
-  :bind ("C-:" . phi-replace)
-  :bind (:map mc/keymap
-              ("C-s" . phi-search)
-              ("C-r" . phi-search-backward)))
-
-(use-package docker
-  :bind ("C-c d" . docker))
-
-(use-package restclient)
-
-(use-package ob-restclient
-  :after (org restclient)
-  :init
-  (org-babel-do-load-languages
-   'org-babel-load-languages '((restclient . t))))
-
-(use-package htmlize)
-
-(use-package org-ref)
-
-(use-package diredfl
-  :commands diredfl-global-mode
-  :init (diredfl-global-mode))
-
-(use-package python-pytest
-  :bind ("C-c t" . python-pytest-popup))
-
-(use-package dired-k
-  :after (dired)
-  :bind (:map dired-mode-map
-              ("g" . dired-k)))
-
+#+begin_src elisp :mkdirp yes :tangle ~/.config/emacs/init.el
 (use-package anaconda-mode
   :after exec-path-from-shell
   :commands (pythonic-activate
              pythonic-deactivate
-             anaconda-
              anaconda-eldoc-mode)
   :init
   (defun activate (virtualenv)
@@ -414,23 +411,12 @@ I'm heavy user of use-package macros that group related commands.
   (add-hook 'python-mode-hook 'anaconda-mode)
   (add-hook 'python-mode-hook 'anaconda-eldoc-mode))
 
-(use-package nix-mode)
+(use-package python-pytest
+  :bind ("C-c t" . python-pytest-popup))
 
-(use-package ivy-pass
-  :commands ivy-pass
-  :init
-  (defun pass ()
-    "Call ivy-pass."
-    (interactive)
-    (ivy-pass)))
+(use-package hydra)
 
-(use-package markdown-mode
-  :commands (markdown-mode)
-  :mode (("\\.md\\'" . markdown-mode)
-         ("\\.markdown\\'" . markdown-mode)))
-
-;; move lines, from https://github.com/kinnala/move-lines
-
+;; from move-lines package, https://github.com/targzeta/move-lines
 (defun move-lines--internal (n)
   "Moves the current line or, if region is actives, the lines surrounding
 region, of N lines. Down if N is positive, up if is negative"
@@ -441,7 +427,6 @@ region, of N lines. Down if N is positive, up if is negative"
          swap-point-mark
          delete-latest-newline)
 
-    ;; STEP 1: identifying the text to cut.
     (when (region-active-p)
       (if (> (point) (mark))
           (setq region-start (mark))
@@ -449,9 +434,7 @@ region, of N lines. Down if N is positive, up if is negative"
         (setq swap-point-mark t
               region-end (point))))
 
-    ;; text-end and region-end
     (end-of-line)
-    ;; If point !< point-max, this buffers doesn't have the trailing newline.
     (if (< (point) (point-max))
         (forward-char 1)
       (setq delete-latest-newline t)
@@ -459,23 +442,18 @@ region, of N lines. Down if N is positive, up if is negative"
     (setq text-end (point)
           region-end (- region-end text-end))
 
-    ;; text-start and region-start
     (goto-char region-start)
     (beginning-of-line)
     (setq text-start (point)
           region-start (- region-start text-end))
 
-    ;; STEP 2: cut and paste.
     (let ((text (delete-and-extract-region text-start text-end)))
       (forward-line n)
-      ;; If the current-column != 0, I have moved the region at the bottom of a
-      ;; buffer doesn't have the trailing newline.
       (when (not (= (current-column) 0))
         (insert-char ?\n)
         (setq delete-latest-newline t))
       (insert text))
 
-    ;; STEP 3: Restoring.
     (forward-char region-end)
 
     (when delete-latest-newline
@@ -546,6 +524,44 @@ region, down by N lines, or 1 line if N is nil."
 (define-key global-map (kbd "C-c p") 'tom/move-lines-p)
 (define-key global-map (kbd "C-c <") 'tom/shift-left)
 (define-key global-map (kbd "C-c >") 'tom/shift-right)
+#+end_src
+
+*** Miscellanous stuff
+
+Including things that I yet haven't categorized.
+
+#+begin_src elisp :mkdirp yes :tangle ~/.config/emacs/init.el
+(use-package exec-path-from-shell
+  :commands exec-path-from-shell-initialize
+  :init (exec-path-from-shell-initialize))
+
+(use-package transient)
+
+(use-package docker
+  :bind ("C-c d" . docker))
+
+(use-package restclient)
+
+(use-package ob-restclient
+  :after (org restclient)
+  :init (org-babel-do-load-languages
+         'org-babel-load-languages '((restclient . t))))
+
+(use-package htmlize)
+
+(use-package org-ref)
+
+(use-package which-key
+  :commands which-key-mode
+  :init (which-key-mode))
+
+(use-package ivy-pass
+  :commands ivy-pass
+  :init
+  (defun pass ()
+    "Call ivy-pass."
+    (interactive)
+    (ivy-pass)))
 
 ;; useful functions
 
@@ -711,12 +727,15 @@ region, down by N lines, or 1 line if N is nil."
 (define-key global-map (kbd "<f10>")
   (lambda () (interactive)
     (find-file "~/Dropbox/Config/nixpkgs/README.org")))
+
 ;; bind compile
 (define-key global-map (kbd "<f12>") 'compile)
 
 ;; load private configurations
 (load "~/Dropbox/Config/emacs/private.el" t)
 #+end_src
+
+*** Custom .desktop file
 
 This custom desktop-file unsets XMODIFIERS due to an issue with deadkeys:
 
