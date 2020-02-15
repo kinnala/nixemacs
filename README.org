@@ -6,7 +6,7 @@ Contents of this file get tangled to $HOME via
 (org-babel-tangle)
 #+end_src
 
-This exports all configuration files under $HOME/.config/nixpkgs/.  The Nix user
+This exports configuration files to $HOME/.config/nixpkgs/.  The Nix user
 environment gets populated by running
 
 #+begin_src sh :results output silent
@@ -17,8 +17,8 @@ nix-env -iAr nixpkgs.tom
 
 This is a checklist for reinstalling my laptop.
 
-1. Install Ubuntu. Remember to encrypt hard drives.
-2. Install tools outside of Nix: dropbox, docker, nix.
+1. Install Ubuntu.
+2. Install tools outside of Nix: e.g., dropbox, docker, nix.
 3. Symlink $HOME/.gnupg and $HOME/.profile.
 4. Tangle this file using a temporary nix-shell environment.
 
@@ -31,7 +31,7 @@ enabled in config.nix:
 { allowUnfree = true; }
 #+end_src
 
-Next, the list of packages gets defined in the following overlay:
+Next, I define a meta-package depending on all the necessary packages:
 
 #+begin_src nix :mkdirp yes :tangle ~/.config/nixpkgs/overlays/99-tom.nix
 self: super: {
@@ -57,9 +57,12 @@ self: super: {
 }
 #+end_src
 
-** Emacs
+** Emacs overlays
 
-Use bleeding edge Emacs.
+I'm using the bleeding edge Emacs overlay from
+https://github.com/nix-community/emacs-overlay, but fixing it to a specific
+commit so thatthe same MELPA package versions are used on my different
+computers.
 
 #+begin_src nix :mkdirp yes :tangle ~/.config/nixpkgs/overlays/01-emacs27.nix
 import (builtins.fetchTarball {
@@ -67,6 +70,11 @@ import (builtins.fetchTarball {
       sha256 = "1x3l0iypc1zchm364axp66m70jjik4pl413lrwj37w320gv23fh5";
 })
 #+end_src
+
+In the following overlay, I enable a custom Emacs .desktop file which fixes a
+bug in Ubuntu 19.10 related to dead keys and Emacs.  The .desktop file is
+defined below.  It also reads the set of ELPA/MELPA packages from my init.el
+(defined below).
 
 #+begin_src nix :mkdirp yes :tangle ~/.config/nixpkgs/overlays/02-emacs.nix
 self: super: {
@@ -86,14 +94,20 @@ self: super: {
 }
 #+end_src
 
-The above configuration is based on the following Emacs init-file:
+** Emacs configuration
+
+I'm heavy user of use-package macros that group related commands.
 
 #+begin_src elisp :mkdirp yes :tangle ~/.config/emacs/init.el
 (require 'package)
 (package-initialize 'noactivate)
 (eval-when-compile
   (require 'use-package))
+#+end_src
 
+*** org-mode
+
+#+begin_src elisp :mkdirp yes :tangle ~/.config/emacs/init.el
 (use-package org
   :commands org-babel-do-load-languages
   :config
@@ -543,6 +557,24 @@ region, down by N lines, or 1 line if N is nil."
     (fill-paragraph nil region)))
 
 (define-key global-map "\M-Q" 'tom/unfill-paragraph)
+
+(defun tom/increment-number-decimal (&optional arg)
+  "Increment the number forward from point by 'arg'."
+  (interactive "p*")
+  (save-excursion
+    (save-match-data
+      (let (inc-by field-width answer)
+        (setq inc-by (if arg arg 1))
+        (skip-chars-backward "0123456789")
+        (when (re-search-forward "[0-9]+" nil t)
+          (setq field-width (- (match-end 0) (match-beginning 0)))
+          (setq answer (+ (string-to-number (match-string 0) 10) inc-by))
+          (when (< answer 0)
+            (setq answer (+ (expt 10 field-width) answer)))
+          (replace-match (format (concat "%0" (int-to-string field-width) "d")
+                                 answer)))))))
+
+(global-set-key (kbd "C-c x") 'tom/increment-number-decimal)
 
 ;; other global configurations
 
