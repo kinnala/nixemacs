@@ -113,7 +113,7 @@ Keywords=Text;Editor;
 
 ** Emacs configuration
 
-Next, we have the beef: a set of use-package macros.
+The Emacs configuration comprises the rest of the snippets.
 
 #+begin_src elisp :mkdirp yes :tangle ~/.config/emacs/init.el
 (require 'package)
@@ -124,13 +124,14 @@ Next, we have the beef: a set of use-package macros.
 
 *** Org-mode
 
-[[file:examples/org.png][file:0examples/org.png]]
+[[file:examples/org.png]]
 
 #+begin_src elisp :mkdirp yes :tangle ~/.config/emacs/init.el
 (use-package org
   :commands org-babel-do-load-languages
   :config
   (unbind-key "C-," org-mode-map)
+  (unbind-key "C-." org-mode-map)
   :init
   (add-hook 'org-mode-hook (lambda ()
                              (fset 'tex-font-lock-suscript 'ignore)
@@ -264,6 +265,7 @@ This triplet of packages allows doing magical things.
 
 #+begin_src elisp :mkdirp yes :tangle ~/.config/emacs/init.el
 (use-package expand-region
+  :after (org)
   :bind ("C-." . er/expand-region)
   :init
   (require 'expand-region)
@@ -306,7 +308,7 @@ This triplet of packages allows doing magical things.
 
 *** Customizations to dired
 
-[[file:examples/dired.png][file:examples/dired.png]]
+[[file:examples/dired.png]]
 
 #+begin_src elisp :mkdirp yes :tangle ~/.config/emacs/init.el
 (defalias 'use-internal-package 'use-package)
