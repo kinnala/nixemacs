@@ -61,8 +61,7 @@ self: super: {
 
 I'm using the bleeding edge Emacs overlay from
 https://github.com/nix-community/emacs-overlay, but fixing it to a specific
-commit so thatthe same MELPA package versions are used on my different
-computers.
+commit so package versions are equivalent on all computers.
 
 #+begin_src nix :mkdirp yes :tangle ~/.config/nixpkgs/overlays/01-emacs27.nix
 import (builtins.fetchTarball {
@@ -71,10 +70,10 @@ import (builtins.fetchTarball {
 })
 #+end_src
 
-In the following overlay, I enable a custom Emacs .desktop file which fixes a
-bug in Ubuntu 19.10 related to dead keys and Emacs.  The .desktop file is
-defined below.  It also reads the set of ELPA/MELPA packages from my init.el
-(defined below).
+The following overlay enables a custom Emacs .desktop file (below) which fixes
+dead keys (^, `, etc.) in Emacs 27/Ubuntu 19.10.  It also uses the function
+=emacsWithPackagesFromUsePackage= from the above Emacs overlay to install a set
+of (M)ELPA packages.
 
 #+begin_src nix :mkdirp yes :tangle ~/.config/nixpkgs/overlays/02-emacs.nix
 self: super: {
@@ -94,7 +93,27 @@ self: super: {
 }
 #+end_src
 
+This is the custom .desktop file. It simply unsets XMODIFIERS which fixes the
+dead keys.
+
+#+begin_src :mkdirp yes :tangle ~/.config/nixpkgs/overlays/emacs/emacs.desktop
+[Desktop Entry]
+Name=Emacs
+GenericName=Text Editor
+Comment=Edit text
+MimeType=text/english;text/plain;text/x-makefile;text/x-c++hdr;text/x-c++src;text/x-chdr;text/x-csrc;text/x-java;text/x-moc;text/x-pascal;text/x-tcl;text/x-tex;application/x-shellscript;text/x-c;text/x-c++;
+Exec=env XMODIFIERS="" emacs %F
+Icon=emacs
+Type=Application
+Terminal=false
+Categories=Development;TextEditor;
+StartupWMClass=Emacs
+Keywords=Text;Editor;
+#+end_src
+
 ** Emacs configuration
+
+Next, we have the beef: a set of use-package macros.
 
 #+begin_src elisp :mkdirp yes :tangle ~/.config/emacs/init.el
 (require 'package)
@@ -735,21 +754,3 @@ Including things that I yet haven't categorized.
 (load "~/Dropbox/Config/emacs/private.el" t)
 #+end_src
 
-*** Custom .desktop file
-
-This custom desktop-file unsets XMODIFIERS due to an issue with deadkeys:
-
-#+begin_src :mkdirp yes :tangle ~/.config/nixpkgs/overlays/emacs/emacs.desktop
-[Desktop Entry]
-Name=Emacs
-GenericName=Text Editor
-Comment=Edit text
-MimeType=text/english;text/plain;text/x-makefile;text/x-c++hdr;text/x-c++src;text/x-chdr;text/x-csrc;text/x-java;text/x-moc;text/x-pascal;text/x-tcl;text/x-tex;application/x-shellscript;text/x-c;text/x-c++;
-Exec=env XMODIFIERS="" emacs %F
-Icon=emacs
-Type=Application
-Terminal=false
-Categories=Development;TextEditor;
-StartupWMClass=Emacs
-Keywords=Text;Editor;
-#+end_src
