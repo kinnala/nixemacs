@@ -124,7 +124,7 @@ Next, we have the beef: a set of use-package macros.
 
 *** Org-mode
 
-[[file:examples/org.png][file:examples/org.png]]
+[[file:examples/org.png][file:0examples/org.png]]
 
 #+begin_src elisp :mkdirp yes :tangle ~/.config/emacs/init.el
 (use-package org
@@ -200,6 +200,8 @@ Next, we have the beef: a set of use-package macros.
 #+end_src
 
 *** Find, select and modify: ivy/counsel/swiper and wgrep
+
+[[file:examples/ivy.png]]
 
 #+begin_src elisp :mkdirp yes :tangle ~/.config/emacs/init.el
 (use-package ivy

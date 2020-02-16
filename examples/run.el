@@ -8,3 +8,13 @@
 (dired ".")
 (redisplay)
 (call-process "import" nil nil nil "dired.png")
+
+;; ivy
+(find-file "ivy.py")
+(defun ivy-screenshot ()
+  (interactive)
+  (redisplay)
+  (call-process "import" nil nil nil "ivy.png"))
+(progn
+  (run-at-time nil nil #'ivy-screenshot)
+  (swiper "= '"))
