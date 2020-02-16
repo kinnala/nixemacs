@@ -1,0 +1,18 @@
+#+TITLE: Org-mode is so cool
+
+
+* Introduction
+
+* Features
+
+** What not's
+
+*** Lorem
+
+**** Ipsum
+
+***** Dolor
+
+****** Sit
+
+******* Amet

@@ -124,6 +124,8 @@ Next, we have the beef: a set of use-package macros.
 
 *** Org-mode
 
+[[file:examples/org.png][file:examples/org.png]]
+
 #+begin_src elisp :mkdirp yes :tangle ~/.config/emacs/init.el
 (use-package org
   :commands org-babel-do-load-languages
@@ -301,6 +303,8 @@ This triplet of packages allows doing magical things.
 #+end_src
 
 *** Customizations to dired
+
+[[file:examples/dired.png][file:examples/dired.png]]
 
 #+begin_src elisp :mkdirp yes :tangle ~/.config/emacs/init.el
 (defalias 'use-internal-package 'use-package)
