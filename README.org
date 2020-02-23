@@ -422,21 +422,13 @@ My current Python workflow is fairly old school and it's complemented by
 =counsel-rg= and =counsel-git=.
 
 #+begin_src elisp :mkdirp yes :tangle ~/.config/emacs/init.el
-(use-package anaconda-mode
-  :after exec-path-from-shell
-  :commands (pythonic-activate
-             pythonic-deactivate
-             anaconda-eldoc-mode)
-  :init
-  (defun activate (virtualenv)
-    "Activate a virtual environment so that pytest recognizes it."
-    (interactive "DEnv: ")
-    (pythonic-activate virtualenv)
-    (exec-path-from-shell-setenv
-     "PATH"
-     (string-join (python-shell-calculate-exec-path) ":")))
-  (add-hook 'python-mode-hook 'anaconda-mode)
-  (add-hook 'python-mode-hook 'anaconda-eldoc-mode))
+(use-package dumb-jump
+  :bind (("M-." . dumb-jump-go)
+         ("M-," . dumb-jump-back))
+  :config (setq dumb-jump-selector 'ivy))
+
+(use-package virtualenvwrapper
+  :init (setq venv-location "~/.conda/envs"))
 
 (use-package python-pytest
   :bind ("C-c t" . python-pytest-popup))
