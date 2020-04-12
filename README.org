@@ -52,6 +52,7 @@ self: super: {
     graphviz = self.graphviz;
     git = self.git;
     vim = self.vim;
+    tmux = self.tmux;
     pandoc = self.pandoc;
   };
 }
@@ -96,7 +97,7 @@ self: super: {
 This is the custom .desktop file. It simply unsets XMODIFIERS which fixes the
 dead keys.
 
-#+begin_src :mkdirp yes :tangle ~/.config/nixpkgs/overlays/emacs/emacs.desktop
+#+begin_src sh :mkdirp yes :tangle ~/.config/nixpkgs/overlays/emacs/emacs.desktop
 [Desktop Entry]
 Name=Emacs
 GenericName=Text Editor
@@ -158,6 +159,13 @@ The Emacs configuration comprises the rest of the snippets.
        (match-beginning 0) (+ (match-beginning 0) 10)
        `(face (:background, backcolor, :foreground, forecolor)))))
   (fset 'tex-font-lock-suscript 'ignore)
+  (defun capture-report-date-file ()
+    (interactive)
+    (let ((name (read-string "Name: ")))
+      (expand-file-name (format "%s-%s.org"
+                                (format-time-string "%Y-%m-%d")
+                                name)
+                        "~/Dropbox/Notes/")))
   (setq org-default-notes-file "~/Dropbox/Notes/gtd/inbox.org"
         org-agenda-files '("~/Dropbox/Notes/gtd/inbox.org"
                            "~/Dropbox/Notes/gtd/tickler.org"
@@ -170,6 +178,7 @@ The Emacs configuration comprises the rest of the snippets.
         org-log-done 'time
         org-tags-column 0
         org-export-babel-evaluate nil
+        org-startup-folded nil
         org-adapt-indentation nil
         org-refile-use-outline-path 'file
         org-structure-template-alist '(("l" . "latex latex")
@@ -195,7 +204,9 @@ The Emacs configuration comprises the rest of the snippets.
                                  "* TODO %?\n  SCHEDULED: %t\n%i\n%a")
                                 ("k" "Entry" entry
                                  (file "~/Dropbox/Notes/gtd/inbox.org")
-                                 "* %?\n%t")))
+                                 "* %?\n%t")
+                                ("n" "Note" entry
+                                 (file capture-report-date-file))))
   :bind (("C-c c" . org-capture)
          ("C-c a" . org-agenda)))
 #+end_src
@@ -279,7 +290,7 @@ This triplet of packages allows doing magical things.
            (starting-point (point)))
       (when search-forward-char
         (search-forward char (point-at-eol)))
-      (flet ((message (&rest args) nil))
+      (cl-flet ((message (&rest args) nil))
         (er--expand-region-1)
         (er--expand-region-1)
         (while (and (not (= (point) (point-min)))
@@ -413,7 +424,9 @@ This triplet of packages allows doing magical things.
   (put 'dired-directory 'face-alias 'diredfl-dir-name)
   (put 'diredp-read-priv 'face-alias 'diredfl-read-priv)
   (global-hl-line-mode)
-  (moe-light))
+  (moe-light)
+  (set-face-attribute 'font-lock-type-face nil :box 1)
+  (set-face-attribute 'font-lock-function-name-face nil :box 1))
 #+end_src
 
 *** Python development
