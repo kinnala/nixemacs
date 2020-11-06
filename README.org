@@ -1,7 +1,4 @@
-/Note: This is my old Ubuntu+Nix configuration and is archived for learning purposes.
-I've since moved over to using NixOS.
-You can find my NixOS configuration at kinnala/nixos repository
-but the Emacs-related parts are very similar./
+/Note: This is my old Ubuntu+Nix configuration and is archived for learning purposes. I've since moved over to using NixOS. You can find my NixOS configuration at [https://github.com/kinnala/nixos] repository./
 
 * Nix and Emacs configuration
 
