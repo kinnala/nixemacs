@@ -20,9 +20,8 @@ nix-env -iAr nixpkgs.tom
 This is a checklist for reinstalling my laptop.
 
 1. Install Ubuntu.
-2. Install tools outside of Nix: e.g., dropbox, docker, nix.
-3. Symlink $HOME/.gnupg and $HOME/.profile.
-4. Tangle this file using a temporary nix-shell environment.
+2. Install Nix.
+3. Tangle this file using a temporary nix-shell environment.
 
 * Nix configuration
 
@@ -38,33 +37,23 @@ Next, I define a meta-package depending on all the necessary packages:
 #+begin_src nix :mkdirp yes :tangle ~/.config/nixpkgs/overlays/99-tom.nix
 self: super: {
   tom = super.tom or {} // {
-    emacsGit = self.lowPrio self.emacsGit; # emacs also writes .desktop => set lower priority
-    emacs-custom-desktop = self.emacs-custom-desktop;
+    emacs = self.emacs;
     nix = self.nix;
-    conda = self.conda;
-    slack = self.slack;
-    gnupg = self.gnupg;
-    pass = self.pass;
     ripgrep = self.ripgrep;
-    htop = self.htop;
-    gmsh = self.gmsh;
-    suitesparse = self.suitesparse;
     gnumake = self.gnumake;
-    xclip = self.xclip;
-    graphviz = self.graphviz;
     git = self.git;
     vim = self.vim;
     tmux = self.tmux;
-    pandoc = self.pandoc;
+    google-chrome = self.google-chrome;
   };
 }
 #+end_src
 
 ** Emacs overlays
 
-I'm using the bleeding edge Emacs overlay from
-https://github.com/nix-community/emacs-overlay, but fixing it to a specific
-commit so package versions are equivalent on all computers.
+This uses the Emacs overlay from https://github.com/nix-community/emacs-overlay,
+but fixing it to a specific commit so package versions are equivalent on all
+computers.
 
 #+begin_src nix :mkdirp yes :tangle ~/.config/nixpkgs/overlays/01-emacs27.nix
 import (builtins.fetchTarball {
@@ -73,50 +62,23 @@ import (builtins.fetchTarball {
 })
 #+end_src
 
-The following overlay enables a custom Emacs .desktop file (below) which fixes
-dead keys (^, `, etc.) in Emacs 27/Ubuntu 19.10.  It also uses the function
-=emacsWithPackagesFromUsePackage= from the above Emacs overlay to install a set
-of (M)ELPA packages.
+The following overlay uses the function =emacsWithPackagesFromUsePackage= from
+the above import to install a set of MELPA packages.
 
 #+begin_src nix :mkdirp yes :tangle ~/.config/nixpkgs/overlays/02-emacs.nix
 self: super: {
-  emacs-custom-desktop = with self; stdenv.mkDerivation {
-    name = "emacs-custom-desktop";
-    src = ./emacs;
-    buildInputs = [];
-    installPhase = ''
-      mkdir -p $out/share/applications
-      cp emacs.desktop $out/share/applications
-    '';
-  };
-  emacsGit = (self.emacsWithPackagesFromUsePackage {
+  emacs = (self.emacsWithPackagesFromUsePackage {
       config = builtins.readFile ~/.config/emacs/init.el;
-      package = super.emacsGit;
+      package = super.emacs;
   });
 }
 #+end_src
 
-This is the custom .desktop file. It simply unsets XMODIFIERS which fixes the
-dead keys.
-
-#+begin_src sh :mkdirp yes :tangle ~/.config/nixpkgs/overlays/emacs/emacs.desktop
-[Desktop Entry]
-Name=Emacs
-GenericName=Text Editor
-Comment=Edit text
-MimeType=text/english;text/plain;text/x-makefile;text/x-c++hdr;text/x-c++src;text/x-chdr;text/x-csrc;text/x-java;text/x-moc;text/x-pascal;text/x-tcl;text/x-tex;application/x-shellscript;text/x-c;text/x-c++;
-Exec=env XMODIFIERS="" emacs %F
-Icon=emacs
-Type=Application
-Terminal=false
-Categories=Development;TextEditor;
-StartupWMClass=Emacs
-Keywords=Text;Editor;
-#+end_src
+The package names are parsed from the Emacs configuration below.
 
 ** Emacs configuration
 
-The Emacs configuration comprises the rest of the snippets.
+The rest of the snippets are combined into a single Emacs init file.
 
 #+begin_src elisp :mkdirp yes :tangle ~/.config/emacs/init.el
 (require 'package)
@@ -142,32 +104,7 @@ The Emacs configuration comprises the rest of the snippets.
                               'org-babel-load-
                               '((python . t)
                                 (shell . t)))))
-  (add-hook 'org-agenda-finalize-hook
-            (lambda ()
-              (save-excursion
-                (set-face-attribute 'org-agenda-structure nil :height (car moe-theme-resize-org-title))
-                (set-face-attribute 'org-agenda-date nil :height (cadr moe-theme-resize-org-title))
-                (set-face-attribute 'org-agenda-date-today nil :height (cadr moe-theme-resize-org-title))
-                (set-face-attribute 'org-agenda-date-weekend nil :height (cadr moe-theme-resize-org-title))
-                (color-org-header "inbox:" "#DDDDFF" "black")
-                (color-org-header "work:" "#FFDDDD" "red")
-                (color-org-header "research:" "#DDFFDD" "DarkGreen"))))
-  (defun color-org-header (tag backcolor forecolor)
-    ""
-    (interactive)
-    (goto-char (point-min))
-    (while (re-search-forward tag nil t)
-      (add-text-properties
-       (match-beginning 0) (+ (match-beginning 0) 10)
-       `(face (:background, backcolor, :foreground, forecolor)))))
   (fset 'tex-font-lock-suscript 'ignore)
-  (defun capture-report-date-file ()
-    (interactive)
-    (let ((name (read-string "Name: ")))
-      (expand-file-name (format "%s-%s.org"
-                                (format-time-string "%Y-%m-%d")
-                                name)
-                        "~/Dropbox/Notes/")))
   (setq org-default-notes-file "~/Dropbox/Notes/gtd/inbox.org"
         org-agenda-files '("~/Dropbox/Notes/gtd/inbox.org"
                            "~/Dropbox/Notes/gtd/tickler.org"
@@ -233,18 +170,6 @@ The Emacs configuration comprises the rest of the snippets.
 (use-package counsel
   :init
   (setq counsel-find-file-ignore-regexp "\\archive\\'")
-  (defun counsel-org-rg ()
-    "Search org notes using ripgrep."
-    (interactive)
-    (counsel-rg "-g*org -g!*archive* -- " "~/Dropbox/Notes" nil nil))
-  (defun counsel-nixpkgs-rg ()
-    "Search nixpkgs using ripgrep."
-    (interactive)
-    (counsel-rg "" "~/.nix-defexpr/channels/nixpkgs" nil nil))
-  (defun counsel-nixpkgs-file ()
-    "Search nixpkgs using ripgrep."
-    (interactive)
-    (counsel-file-jump "" "~/.nix-defexpr/channels/nixpkgs"))
   :bind (("M-x" . counsel-M-x)
          ("C-x C-f" . counsel-find-file)
          ("C-c g" . counsel-rg)
@@ -433,8 +358,9 @@ This triplet of packages allows doing magical things.
 
 *** Python development
 
-My current Python workflow is fairly old school and it's complemented by
-=counsel-rg= and =counsel-git=.
+My current Python workflow is fairly old school, using =dumb-jump=, and it's
+complemented by =counsel-rg= and =counsel-git=.  There are also some nice
+functions for moving lines and changing the indentation.
 
 #+begin_src elisp :mkdirp yes :tangle ~/.config/emacs/init.el
 (use-package dumb-jump
@@ -562,7 +488,7 @@ region, down by N lines, or 1 line if N is nil."
 
 *** Miscellanous stuff
 
-Including things that I yet haven't categorized.
+This section include sother stuff that I yet haven't categorized.
 
 #+begin_src elisp :mkdirp yes :tangle ~/.config/emacs/init.el
 (use-package exec-path-from-shell
@@ -756,11 +682,6 @@ Including things that I yet haven't categorized.
   (kbd "M-4")
   (lambda () (interactive)
     (tom/select-frame 3)))
-
-;; bind find config
-(define-key global-map (kbd "<f10>")
-  (lambda () (interactive)
-    (find-file "~/Dropbox/Config/nixpkgs/README.org")))
 
 ;; bind compile
 (define-key global-map (kbd "<f12>") 'compile)
