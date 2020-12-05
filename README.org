@@ -1,4 +1,4 @@
-/Note: This is my old Ubuntu+Nix configuration and is archived for learning purposes. I've since moved over to using NixOS. You can find my NixOS configuration at https://github.com/kinnala/nixos repository./
+/Note: This is my old Ubuntu+Nix configuration and is archived for learning purposes. I've since moved over to using NixOS./
 
 * Nix and Emacs configuration
 
