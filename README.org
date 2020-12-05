@@ -68,7 +68,7 @@ the above import to install a set of MELPA packages.
 #+begin_src nix :mkdirp yes :tangle ~/.config/nixpkgs/overlays/02-emacs.nix
 self: super: {
   emacs = (self.emacsWithPackagesFromUsePackage {
-      config = builtins.readFile ~/.config/emacs/init.el;
+      config = builtins.readFile ~/.emacs.d/init.el;
       package = super.emacs;
   });
 }
@@ -80,7 +80,7 @@ The package names are parsed from the Emacs configuration below.
 
 The rest of the snippets are combined into a single Emacs init file.
 
-#+begin_src elisp :mkdirp yes :tangle ~/.config/emacs/init.el
+#+begin_src elisp :mkdirp yes :tangle ~/.emacs.d/init.el
 (require 'package)
 (package-initialize 'noactivate)
 (eval-when-compile
@@ -91,7 +91,7 @@ The rest of the snippets are combined into a single Emacs init file.
 
 [[file:examples/org.png]]
 
-#+begin_src elisp :mkdirp yes :tangle ~/.config/emacs/init.el
+#+begin_src elisp :mkdirp yes :tangle ~/.emacs.d/init.el
 (use-package org
   :commands org-babel-do-load-languages
   :config
@@ -154,7 +154,7 @@ The rest of the snippets are combined into a single Emacs init file.
 
 [[file:examples/ivy.png]]
 
-#+begin_src elisp :mkdirp yes :tangle ~/.config/emacs/init.el
+#+begin_src elisp :mkdirp yes :tangle ~/.emacs.d/init.el
 (use-package ivy
   :commands
   ivy-mode
@@ -189,7 +189,7 @@ The rest of the snippets are combined into a single Emacs init file.
 
 *** Magit
 
-#+begin_src elisp :mkdirp yes :tangle ~/.config/emacs/init.el
+#+begin_src elisp :mkdirp yes :tangle ~/.emacs.d/init.el
 (use-package magit
   :init
   (setq magit-repository-directories '(("~/src" . 1)))
@@ -201,7 +201,7 @@ The rest of the snippets are combined into a single Emacs init file.
 
 This triplet of packages allows doing magical things.
 
-#+begin_src elisp :mkdirp yes :tangle ~/.config/emacs/init.el
+#+begin_src elisp :mkdirp yes :tangle ~/.emacs.d/init.el
 (use-package expand-region
   :after (org)
   :bind ("C-." . er/expand-region)
@@ -248,7 +248,7 @@ This triplet of packages allows doing magical things.
 
 [[file:examples/dired.png]]
 
-#+begin_src elisp :mkdirp yes :tangle ~/.config/emacs/init.el
+#+begin_src elisp :mkdirp yes :tangle ~/.emacs.d/init.el
 (defalias 'use-internal-package 'use-package)
 
 (use-internal-package term)
@@ -288,7 +288,7 @@ This triplet of packages allows doing magical things.
 
 *** Additional syntax highlighting
 
-#+begin_src elisp :mkdirp yes :tangle ~/.config/emacs/init.el
+#+begin_src elisp :mkdirp yes :tangle ~/.emacs.d/init.el
 (use-package json-mode)
 
 (use-package julia-mode)
@@ -312,7 +312,7 @@ This triplet of packages allows doing magical things.
 
 *** Emacs theme
 
-#+begin_src elisp :mkdirp yes :tangle ~/.config/emacs/init.el
+#+begin_src elisp :mkdirp yes :tangle ~/.emacs.d/init.el
 (use-package moe-theme
   :commands moe-light
   :init
@@ -362,7 +362,7 @@ My current Python workflow is fairly old school, using =dumb-jump=, and it's
 complemented by =counsel-rg= and =counsel-git=.  There are also some nice
 functions for moving lines and changing the indentation.
 
-#+begin_src elisp :mkdirp yes :tangle ~/.config/emacs/init.el
+#+begin_src elisp :mkdirp yes :tangle ~/.emacs.d/init.el
 (use-package dumb-jump
   :bind (("M-." . dumb-jump-go)
          ("M-," . dumb-jump-back))
@@ -490,7 +490,7 @@ region, down by N lines, or 1 line if N is nil."
 
 This section include sother stuff that I yet haven't categorized.
 
-#+begin_src elisp :mkdirp yes :tangle ~/.config/emacs/init.el
+#+begin_src elisp :mkdirp yes :tangle ~/.emacs.d/init.el
 (use-package exec-path-from-shell
   :commands exec-path-from-shell-initialize
   :init (exec-path-from-shell-initialize))
