@@ -1,0 +1,47 @@
+#+TITLE: Emacs on Nix
+#+AUTHOR: Tom Gustafsson
+
+#+begin_src nix
+with (import <nixpkgs> {});
+
+stdenv.mkDerivation rec {
+  name = "straight.el";
+  src = fetchFromGitHub {
+    owner = "raxod502";
+    repo = "straight.el";
+    rev = "59c92dd45085b8f8fc44ea0039c205f4a3c43b62";
+    sha256 = "00ibxmgqfb5bqd4b9jqj8vdiszkph6vv64m1y3kf9xav15v8sfyx";
+  };
+  phases = [ "unpackPhase" "buildPhase" "installPhase" ];
+  buildPhase = ''
+    sed -i -e 's/    (with-current-buffer/    (with-temp-buffer/g' install.el
+    sed -i -e 's|        (url-retrieve-synchronously|(insert-file-contents "'"$out"'/straight.el")|g' install.el
+    sed -i -e 's/         (format//g' install.el
+    sed -i -e 's/          (concat "https:\/\/raw.githubusercontent.com\/"//g' install.el
+    sed -i -e 's/                  "raxod502\/straight.el\/install\/%s\/straight.el")//g' install.el
+    sed -i -e 's/          (substring (symbol-name version) 1))//g' install.el
+    sed -i -e "s/         'silent 'inhibit-cookies)//g" install.el
+    sed -i -e "s/      (unless (equal url-http-response-status 200)//g" install.el
+    sed -i -e 's/        (error "Unknown recipe version: %S" version))//g' install.el  
+    sed -i -e "s/      (delete-region (point-min) url-http-end-of-headers)//g" install.el
+  '';
+  installPhase = ''
+    mkdir -p $out/
+    cp install.el straight.el $out/
+  '';
+}
+#+end_src
+
+#+begin_src emacs-lisp
+(defvar bootstrap-version)
+(let ((bootstrap-file
+       (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
+      (bootstrap-version 5))
+  (unless (file-exists-p bootstrap-file)
+    (with-temp-buffer
+      (insert-file-contents "/nix/store/zqpz3x18lpacsj88xnz20413ya8wv1cf-straight.el/install.el")
+      (goto-char (point-max))
+      (eval-print-last-sexp)))
+    )
+  (load bootstrap-file nil 'nomessage))
+#+end_src
