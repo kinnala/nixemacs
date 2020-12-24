@@ -1,11 +1,15 @@
 #+TITLE: Emacs on Nix
 #+AUTHOR: Tom Gustafsson
 
+#+begin_src emacs-lisp
+(org-babel-tangle)
+#+end_src
+
 #+begin_src nix
-with (import <nixpkgs> {});
+{ stdenv, fetchFromGithub }:
 
 stdenv.mkDerivation rec {
-  name = "straight.el";
+  name = "emacs-straight";
   src = fetchFromGitHub {
     owner = "raxod502";
     repo = "straight.el";
@@ -32,6 +36,18 @@ stdenv.mkDerivation rec {
 }
 #+end_src
 
+#+begin_src nix
+self: super: {
+  tomacs = super.tom or {} // {
+    emacs = self.emacs;
+    emacs-straight = self.callPackage (import ./straight/default.nix) {};
+    ripgrep = self.ripgrep;
+    gnumake = self.gnumake;
+    git = self.git;
+  };
+}
+#+end_src
+
 #+begin_src emacs-lisp
 (defvar bootstrap-version)
 (let ((bootstrap-file
@@ -45,3 +61,4 @@ stdenv.mkDerivation rec {
     )
   (load bootstrap-file nil 'nomessage))
 #+end_src
+
