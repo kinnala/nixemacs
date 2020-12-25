@@ -5,19 +5,19 @@
 
 This is my reproducible Emacs configuration on top of Nix and straight.el.  Nix
 takes care of any system-level dependencies and downloading an initial version
-of straight.el which then manages the Emacs Lisp packages.
+of straight.el which then installs and manages itself and other Emacs Lisp
+packages.
 
 * Installation
 
 You can try the config, e.g., inside Docker by running the following steps:
 
-1. =docker run -it nixos/nix /bin/sh=
-2. =nix-shell -p emacs git=
-3. =git clone https://github.com/kinnala/nixemacs.git && cd nixemacs=
-5. =emacs --file readme.org --eval '(progn (org-babel-tangle) (kill-emacs))'=
-6. =nix-env -i tom=
-7. =emacs=
-
+1. Start container: =docker run -it nixos/nix /bin/sh=
+2. Enter temporary shell for tangling: =nix-shell -p emacs-nox wget=
+3. Download this file: =wget https://raw.githubusercontent.com/kinnala/nixemacs/master/readme.org=
+4. Tangle this file: =emacs --file readme.org --eval '(progn (org-babel-tangle) (kill-emacs))'=
+5. Install packages using Nix: =nix-env -i tom=
+6. Run Emacs and install packages using straight.el: =emacs=
 
 * Derivation for straight.el
 
@@ -71,6 +71,9 @@ stdenv.mkDerivation rec {
 
 * Overlay for dependencies
 
+This uses the above derivation and calls =buildEnv= for creating a set of
+packages.
+
 #+begin_src nix :mkdirp yes :tangle ~/.config/nixpkgs/overlays/emacs.nix
 self: super:
 {
@@ -92,6 +95,8 @@ self: super:
 #+end_src
 
 * Pinning Emacs packages
+
+This is a version lockfile for straight.el.
 
 #+begin_src elisp :mkdirp yes :tangle ~/.emacs.d/straight/versions/default.el
 (("Emacs-wgrep" . "f0ef9bfa44db503cdb2f83fcfbd2fa4e2382ef1f")
@@ -133,10 +138,12 @@ self: super:
 :beta
 #+end_src
 
-* Emacs init-file
+* Emacs init file
 
-This configures straight.el and runs the customized straight.el initialization
-script from Nix store.
+The rest of the snippets are combined into Emacs init file.  The first snippet
+configures straight.el and runs a customized straight.el initialization script
+from the Nix store (=straight-init-path= returns path to the initialization
+script):
 
 #+begin_src elisp :mkdirp yes :tangle ~/.emacs.d/init.el
 (setq straight-use-package-by-default t)
