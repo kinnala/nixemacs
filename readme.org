@@ -1,95 +1,140 @@
-/Note: This is my old Ubuntu+Nix configuration and is archived for learning purposes. I've since moved over to using NixOS./
+#+TITLE: Emacs configuration files
+#+AUTHOR: Tom Gustafsson
 
-* Nix and Emacs configuration
+* Introduction
 
-Contents of this file get tangled to $HOME via
+This is my reproducible Emacs configuration on top of Nix and straight.el.  Nix
+takes care of any system-level dependencies and downloading an initial version
+of straight.el which then manages the Emacs Lisp packages.
 
-#+begin_src elisp :results output silent
-(org-babel-tangle)
+* Derivation for straight.el
+
+The initial version of straight.el is patched slightly so that it doesn't
+perform any HTTP requests while bootstrapping.  All requests to straight.el
+GitHub repo are replaced by file reads to the Nix store.
+
+#+begin_src nix :mkdirp yes :tangle ~/.config/nixpkgs/straight/default.nix
+{ stdenv, fetchFromGitHub }:
+
+stdenv.mkDerivation rec {
+  name = "straight.el";
+  src = fetchFromGitHub {
+    owner = "raxod502";
+    repo = "straight.el";
+    rev = "59c92dd45085b8f8fc44ea0039c205f4a3c43b62";
+    sha256 = "00ibxmgqfb5bqd4b9jqj8vdiszkph6vv64m1y3kf9xav15v8sfyx";
+  };
+  buildPhase = ''
+    sed -i -e 's|(with-current-buffer|(with-temp-buffer|g' install.el
+    sed -i -e 's|(url-retrieve-synchronously|(insert-file-contents "'"$out"'/share/straight/straight.el")|g' install.el
+    sed -i -e 's|         (format||g' install.el
+    sed -i -e 's|(concat "https:\/\/raw.githubusercontent.com\/"||g' install.el
+    sed -i -e 's|"raxod502\/straight.el\/install\/%s\/straight.el")||g' install.el
+    sed -i -e 's|(substring (symbol-name version) 1))||g' install.el
+    sed -i -e "s|'silent 'inhibit-cookies)||g" install.el
+    sed -i -e "s|(unless (equal url-http-response-status 200)||g" install.el
+    sed -i -e 's|(error "Unknown recipe version: %S" version))||g' install.el  
+    sed -i -e "s|(delete-region (point-min) url-http-end-of-headers)||g" install.el
+    echo '(defvar bootstrap-version)
+          (let ((bootstrap-file
+                 (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
+                (bootstrap-version 5))
+            (unless (file-exists-p bootstrap-file)
+              (with-temp-buffer
+                (insert-file-contents "'"$out"'/share/straight/install.el")
+                (goto-char (point-max))
+                (eval-print-last-sexp)))
+            (load bootstrap-file nil '"'"'nomessage))' > init.el
+     echo -e '#!/bin/bash\necho -n "'"$out"'/share/straight/init.el"' > straight-init-path
+  '';
+  installPhase = ''
+    mkdir -p $out/share/straight
+    cp install.el straight.el init.el $out/share/straight/
+    mkdir -p $out/bin
+    cp straight-init-path $out/bin/
+    chmod +x $out/bin/straight-init-path
+  '';
+}
 #+end_src
 
-This exports configuration files to $HOME/.config/nixpkgs/.  The Nix user
-environment gets populated by running
+* Overlay for dependencies
 
-#+begin_src sh :results output silent
-nix-env -iAr nixpkgs.tom
-#+end_src
-
-* Setting up a new box
-
-This is a checklist for reinstalling my laptop.
-
-1. Install Ubuntu.
-2. Install Nix.
-3. Tangle this file using a temporary nix-shell environment.
-
-* Nix configuration
-
-Most of my software gets installed via Nix.  First, proprietary software is
-enabled in config.nix:
-
-#+begin_src nix :mkdirp yes :tangle ~/.config/nixpkgs/config.nix
-{ allowUnfree = true; }
-#+end_src
-
-Next, I define a meta-package depending on all the necessary packages:
-
-#+begin_src nix :mkdirp yes :tangle ~/.config/nixpkgs/overlays/99-tom.nix
-self: super: {
-  tom = super.tom or {} // {
-    emacs = self.emacs;
-    nix = self.nix;
-    ripgrep = self.ripgrep;
-    gnumake = self.gnumake;
-    git = self.git;
-    vim = self.vim;
-    tmux = self.tmux;
-    google-chrome = self.google-chrome;
+#+begin_src nix :mkdirp yes :tangle ~/.config/nixpkgs/overlays/emacs.nix
+self: super:
+{
+  straight.el = super.callPackage (import ../straight/default.nix) {};
+  tom = super.buildEnv {
+    name = "tom";
+    paths = [
+      self.emacs
+      self.straight.el
+      self.ripgrep
+      self.gnumake
+      self.git
+      self.mu
+      self.pass
+      self.offlineimap
+    ];
   };
 }
 #+end_src
 
-** Emacs overlays
+* Pinning Emacs packages
 
-This uses the Emacs overlay from https://github.com/nix-community/emacs-overlay,
-but fixing it to a specific commit so package versions are equivalent on all
-computers.
-
-#+begin_src nix :mkdirp yes :tangle ~/.config/nixpkgs/overlays/01-emacs27.nix
-import (builtins.fetchTarball {
-      url = "https://github.com/nix-community/emacs-overlay/archive/86707a04d9679a92b7454e073a13e0c676e59e6d.tar.gz";
-      sha256 = "1x3l0iypc1zchm364axp66m70jjik4pl413lrwj37w320gv23fh5";
-})
+#+begin_src elisp :mkdirp yes :tangle ~/.emacs.d/straight/versions/default.el
+(("Emacs-wgrep" . "f0ef9bfa44db503cdb2f83fcfbd2fa4e2382ef1f")
+ ("Highlight-Indentation-for-Emacs" . "4fc4e346c17e4e975a8c8ece3d4e7240357e2869")
+ ("auth-source-pass" . "aa7f17116ec3f760eb414d655ba20016b11a4a0e")
+ ("csv-mode" . "80930bc0d8c7228cd8706c2c989bdd3a3667fbeb")
+ ("dash.el" . "0517ab1ed18fd3af3c6131ca9e3a6e915036f809")
+ ("dired-k" . "0ddf0adb3a642c2f0694d8c1c12f263f2bf27375")
+ ("diredfl" . "cd052dfef602fe79d8dfbcf9f06e6da74412218b")
+ ("dumb-jump" . "ff9fc9360d39f5e07c1f480f8b0656b49606781b")
+ ("emacs-async" . "14f48de586b0977e3470f053b810d77b07ea427a")
+ ("emacs-leuven-theme" . "898c1426c29abbb1c86a715b1323669e30d4699e")
+ ("emacs-which-key" . "428aedfce0157920814fbb2ae5d00b4aea89df88")
+ ("emacsmirror-mirror" . "73d68771488284cceb42f70fda551e0a516cb249")
+ ("exec-path-from-shell" . "d14d6d2966efe5a1409f84a6b9d998268f74761d")
+ ("expand-region.el" . "ea6b4cbb9985ddae532bd2faf9bb00570c9f2781")
+ ("gnu-elpa-mirror" . "fcb3cf5ba5f16885f7851885c954222aee6f03ab")
+ ("hydra" . "2d553787aca1aceb3e6927e426200e9bb9f056f1")
+ ("ivy-pass" . "5b523de1151f2109fdd6a8114d0af12eef83d3c5")
+ ("json-mode" . "0e819e519ae17a2686e0881c4ca51fa873fa9b83")
+ ("json-reformat" . "8eb6668ed447988aea06467ba8f42e1f2178246f")
+ ("json-snatcher" . "b28d1c0670636da6db508d03872d96ffddbc10f2")
+ ("magit" . "ab0e0b80abcc01ca041321d1ffd2b9c0d83e2465")
+ ("markdown-mode" . "e250a8465f805644d372c264eb0572f569d7f2a1")
+ ("melpa" . "2e08b9272fe0416469ea00ba2ec6bbda4beca3cb")
+ ("multiple-cursors.el" . "a9d7764f80b241978f3d4e76bc981ef10bab5d70")
+ ("nix-mode" . "e32c6bf7ad6dfe1d7ef9ee07d4da6e50174037bf")
+ ("org" . "7a9a8a56af4cf02abc1fb86eda96f0c7dc6b0348")
+ ("password-store" . "f152064da9832d6d3d2b4e75f43f63bf2d50716f")
+ ("phi-search" . "c34f5800968922d1f9e7b10092b8705d6640ad18")
+ ("popup-el" . "13364d7674535db225789b03da766746734a4f28")
+ ("s.el" . "43ba8b563bee3426cead0e6d4ddc09398e1a349d")
+ ("straight.el" . "2d407bccd9378f1d5218f8ba2ae85c6be73fbaf1")
+ ("swiper" . "34a203f05457cdc227ff36e28ca1d3a7f03c8c15")
+ ("transient" . "4a2b7fdf75c6940b5b311d930ea26f7e85a08cd4")
+ ("use-package" . "caa92f1d64fc25480551757d854b4b49981dfa6b")
+ ("virtualenvwrapper.el" . "107e7e0bf923f44d217712772cd58b414d0065cb")
+ ("with-editor" . "6735180e73e787b79535c245b162249b70dbf841")
+ ("yaml-mode" . "fc5e1c58f94472944c4aa838f00f6adcac6fa992"))
+:beta
 #+end_src
 
-The following overlay uses the function =emacsWithPackagesFromUsePackage= from
-the above import to install a set of MELPA packages.
+* Emacs init-file
 
-#+begin_src nix :mkdirp yes :tangle ~/.config/nixpkgs/overlays/02-emacs.nix
-self: super: {
-  emacs = (self.emacsWithPackagesFromUsePackage {
-      config = builtins.readFile ~/.emacs.d/init.el;
-      package = super.emacs;
-  });
-}
-#+end_src
-
-The package names are parsed from the Emacs configuration below.
-
-** Emacs configuration
-
-The rest of the snippets are combined into a single Emacs init file.
+This configures straight.el and runs the customized straight.el initialization
+script from Nix store.
 
 #+begin_src elisp :mkdirp yes :tangle ~/.emacs.d/init.el
-(require 'package)
-(package-initialize 'noactivate)
-(eval-when-compile
-  (require 'use-package))
+(setq straight-use-package-by-default t)
+(setq straight-vc-git-default-clone-depth 20)
+(load-file (shell-command-to-string "straight-init-path"))
+(straight-use-package 'use-package)
 #+end_src
 
-*** Org-mode
-
-[[file:examples/org.png]]
+** org-mode
 
 #+begin_src elisp :mkdirp yes :tangle ~/.emacs.d/init.el
 (use-package org
@@ -101,21 +146,20 @@ The rest of the snippets are combined into a single Emacs init file.
   (add-hook 'org-mode-hook (lambda ()
                              (fset 'tex-font-lock-suscript 'ignore)
                              (org-babel-do-load-languages
-                              'org-babel-load-
+                              'org-babel-load-languages
                               '((python . t)
                                 (shell . t)))))
+  (add-hook 'org-babel-after-execute-hook 'org-redisplay-inline-images)
+  (global-set-key [remap org-set-tags-command] #'counsel-org-tag)
   (fset 'tex-font-lock-suscript 'ignore)
   (setq org-default-notes-file "~/Dropbox/Notes/gtd/inbox.org"
-        org-agenda-files '("~/Dropbox/Notes/gtd/inbox.org"
-                           "~/Dropbox/Notes/gtd/tickler.org"
-                           "~/Dropbox/Notes/gtd/research.org"
-                           "~/Dropbox/Notes/gtd/work.org")
-        org-refile-targets '(("~/Dropbox/Notes/gtd/inbox.org" . (:maxlevel . 1))
-                             ("~/Dropbox/Notes/gtd/tickler.org" . (:maxlevel . 1))
-                             ("~/Dropbox/Notes/gtd/research.org" . (:maxlevel . 1))
-                             ("~/Dropbox/Notes/gtd/work.org" . (:maxlevel . 1)))
+        org-agenda-files '("~/Dropbox/Notes/gtd/")
+        org-refile-targets '((nil :maxlevel . 9)
+                             (org-agenda-files :maxlevel . 9))
         org-log-done 'time
         org-tags-column 0
+        org-agenda-tags-column 0
+        org-agenda-window-setup 'only-window
         org-export-babel-evaluate nil
         org-startup-folded nil
         org-adapt-indentation nil
@@ -143,16 +187,13 @@ The rest of the snippets are combined into a single Emacs init file.
                                  "* TODO %?\n  SCHEDULED: %t\n%i\n%a")
                                 ("k" "Entry" entry
                                  (file "~/Dropbox/Notes/gtd/inbox.org")
-                                 "* %?\n%t")
-                                ("n" "Note" entry
-                                 (file capture-report-date-file))))
+                                 "* %?\n%t")))
   :bind (("C-c c" . org-capture)
          ("C-c a" . org-agenda)))
 #+end_src
 
-*** Find, select and modify: ivy/counsel/swiper and wgrep
 
-[[file:examples/ivy.png]]
+** ivy and wgrep
 
 #+begin_src elisp :mkdirp yes :tangle ~/.emacs.d/init.el
 (use-package ivy
@@ -174,9 +215,7 @@ The rest of the snippets are combined into a single Emacs init file.
          ("C-x C-f" . counsel-find-file)
          ("C-c g" . counsel-rg)
          ("C-c G" . counsel-git)
-         ("C-c o" . counsel-org-rg)
-         ("C-c l" . counsel-nixpkgs-rg)
-         ("C-c L" . counsel-nixpkgs-file)
+         ("C-c j" . counsel-file-jump)
          ("C-x b" . counsel-switch-buffer)
          ("C-c h" . counsel-minibuffer-history)
          ("M-y" . counsel-yank-pop)))
@@ -187,7 +226,7 @@ The rest of the snippets are combined into a single Emacs init file.
 (use-package wgrep)
 #+end_src
 
-*** Magit
+** magit
 
 #+begin_src elisp :mkdirp yes :tangle ~/.emacs.d/init.el
 (use-package magit
@@ -197,9 +236,7 @@ The rest of the snippets are combined into a single Emacs init file.
          ("C-c M-g" . magit-file-dispatch)))
 #+end_src
 
-*** Multiline editing
-
-This triplet of packages allows doing magical things.
+** multiline editing
 
 #+begin_src elisp :mkdirp yes :tangle ~/.emacs.d/init.el
 (use-package expand-region
@@ -233,7 +270,8 @@ This triplet of packages allows doing magical things.
   :init
   (define-key global-map (kbd "C-'") 'mc-hide-unmatched-lines-mode)
   (define-key global-map (kbd "C-,") 'mc/mark-next-like-this)
-  (define-key global-map (kbd "C-;") 'mc/mark-all-dwim))
+  (define-key global-map (kbd "C-;") 'mc/mark-all-dwim)
+  (setq hum/lines-to-expand 1))
 
 (use-package phi-search
   :after multiple-cursors
@@ -244,18 +282,17 @@ This triplet of packages allows doing magical things.
               ("C-r" . phi-search-backward)))
 #+end_src
 
-*** Customizations to dired
-
-[[file:examples/dired.png]]
+** dired
 
 #+begin_src elisp :mkdirp yes :tangle ~/.emacs.d/init.el
-(defalias 'use-internal-package 'use-package)
+(use-package term
+  :straight nil)
 
-(use-internal-package term)
+(use-package dired-x
+  :straight nil)
 
-(use-internal-package dired-x)
-
-(use-internal-package dired
+(use-package dired
+  :straight nil
   :after (term dired-x)
   :init
   (setq dired-dwim-target t)
@@ -283,43 +320,8 @@ This triplet of packages allows doing magical things.
 
 (use-package diredfl
   :commands diredfl-global-mode
-  :init (diredfl-global-mode))
-#+end_src
-
-*** Additional syntax highlighting
-
-#+begin_src elisp :mkdirp yes :tangle ~/.emacs.d/init.el
-(use-package json-mode)
-
-(use-package julia-mode)
-
-(use-package highlight-indentation
-  :init (add-hook 'prog-mode-hook 'highlight-indentation-mode))
-
-(use-package yaml-mode)
-
-(use-package csv-mode
-  :mode "\\.csv$"
-  :init (setq csv-separators '(";")))
-
-(use-package markdown-mode
-  :commands (markdown-mode)
-  :mode (("\\.md\\'" . markdown-mode)
-         ("\\.markdown\\'" . markdown-mode)))
-
-(use-package nix-mode)
-#+end_src
-
-*** Emacs theme
-
-#+begin_src elisp :mkdirp yes :tangle ~/.emacs.d/init.el
-(use-package moe-theme
-  :commands moe-light
   :init
-  (require 'org)
-  (setq moe-theme-resize-markdown-title '(2.0 1.7 1.5 1.3 1.0 1.0))
-  (setq moe-theme-resize-org-title '(2.2 1.8 1.6 1.4 1.2 1.0 1.0 1.0 1.0))
-  (setq moe-theme-resize-rst-title '(2.0 1.7 1.5 1.3 1.1 1.0))
+  (diredfl-global-mode)
   (put 'diredp-tagged-autofile-name 'face-alias 'diredfl-tagged-autofile-name)
   (put 'diredp-autofile-name 'face-alias 'diredfl-autofile-name)
   (put 'diredp-ignored-file-name 'face-alias 'diredfl-ignored-file-name)
@@ -349,18 +351,48 @@ This triplet of packages allows doing magical things.
   (put 'diredp-write-priv 'face-alias 'diredfl-write-priv)
   (put 'diredp-global-mode-buffers 'face-alias 'diredfl-global-mode-buffers)
   (put 'dired-directory 'face-alias 'diredfl-dir-name)
-  (put 'diredp-read-priv 'face-alias 'diredfl-read-priv)
-  (global-hl-line-mode)
-  (moe-light)
-  (set-face-attribute 'font-lock-type-face nil :box 1)
-  (set-face-attribute 'font-lock-function-name-face nil :box 1))
+  (put 'diredp-read-priv 'face-alias 'diredfl-read-priv))
 #+end_src
 
-*** Python development
+** syntax highlighting
 
-My current Python workflow is fairly old school, using =dumb-jump=, and it's
-complemented by =counsel-rg= and =counsel-git=.  There are also some nice
-functions for moving lines and changing the indentation.
+#+begin_src elisp :mkdirp yes :tangle ~/.emacs.d/init.el
+(use-package json-mode)
+
+(use-package highlight-indentation
+  :init
+  (defun set-hl-indent-color ()
+    (set-face-background 'highlight-indentation-face "#AAAAAA"))
+  (add-hook 'prog-mode-hook 'highlight-indentation-mode)
+  (add-hook 'prog-mode-hook 'set-hl-indent-color))
+
+(use-package yaml-mode)
+
+(use-package csv-mode
+  :mode "\\.csv$"
+  :init (setq csv-separators '(";")))
+
+(use-package markdown-mode
+  :commands (markdown-mode)
+  :mode (("\\.md\\'" . markdown-mode)
+         ("\\.markdown\\'" . markdown-mode)))
+
+(use-package nix-mode)
+#+end_src
+
+*** theme
+
+#+begin_src elisp :mkdirp yes :tangle ~/.emacs.d/init.el
+(use-package leuven-theme
+  :config
+  (load-theme 'leuven t)
+  (set-face-attribute 'font-lock-type-face nil :box 1)
+  (set-face-attribute 'font-lock-function-name-face nil :box 1))
+
+(global-hl-line-mode)
+#+end_src
+
+*** python
 
 #+begin_src elisp :mkdirp yes :tangle ~/.emacs.d/init.el
 (use-package dumb-jump
@@ -370,9 +402,6 @@ functions for moving lines and changing the indentation.
 
 (use-package virtualenvwrapper
   :init (setq venv-location "~/.conda/envs"))
-
-(use-package python-pytest
-  :bind ("C-c t" . python-pytest-popup))
 
 (use-package hydra)
 
@@ -486,30 +515,14 @@ region, down by N lines, or 1 line if N is nil."
 (define-key global-map (kbd "C-c >") 'tom/shift-right)
 #+end_src
 
-*** Miscellanous stuff
+*** misc stuff
 
-This section include sother stuff that I yet haven't categorized.
-
-#+begin_src elisp :mkdirp yes :tangle ~/.emacs.d/init.el
+#+begin_src elisp :mkdirp yes :tangle  ~/.emacs.d/init.el
 (use-package exec-path-from-shell
   :commands exec-path-from-shell-initialize
   :init (exec-path-from-shell-initialize))
 
 (use-package transient)
-
-(use-package docker
-  :bind ("C-c d" . docker))
-
-(use-package restclient)
-
-(use-package ob-restclient
-  :after (org restclient)
-  :init (org-babel-do-load-languages
-         'org-babel-load-languages '((restclient . t))))
-
-(use-package htmlize)
-
-(use-package org-ref)
 
 (use-package which-key
   :commands which-key-mode
@@ -572,9 +585,8 @@ This section include sother stuff that I yet haven't categorized.
 (windmove-default-keybindings)
 
 ;; fonts
-(set-face-attribute 'mode-line-inactive nil :font "Ubuntu Mono-12")
-(set-face-attribute 'default nil :font "Ubuntu Mono-16")
-(set-face-attribute 'mode-line nil :font "Ubuntu Mono-12")
+(set-face-attribute 'default nil :font "Liberation Mono-11")
+(set-face-attribute 'line-number nil :font "Liberation Mono-8")
 
 ;; disable tool and menu bars
 (tool-bar-mode -1)
@@ -614,7 +626,7 @@ This section include sother stuff that I yet haven't categorized.
 (setq scroll-preserve-screen-position t)
 
 ;; set default fill width (e.g. M-q)
-(setq-default fill-column 80)
+(setq-default fill-column 79)
 
 ;; window dividers
 (fringe-mode 0)
@@ -634,6 +646,7 @@ This section include sother stuff that I yet haven't categorized.
 
 ;; browse in chrome
 (setq browse-url-browser-function 'browse-url-chrome)
+(setq shr-width 80)
 
 ;; don't fontify latex
 (setq font-latex-fontify-script nil)
@@ -663,8 +676,7 @@ This section include sother stuff that I yet haven't categorized.
   (let ((frame (nth n (reverse (frame-list)))))
     (if frame
         (select-frame-set-input-focus frame)
-      (select-frame-set-input-focus (make-frame))
-      (toggle-frame-fullscreen))))
+      (select-frame-set-input-focus (make-frame)))))
 
 (define-key global-map
   (kbd "M-1")
@@ -683,10 +695,14 @@ This section include sother stuff that I yet haven't categorized.
   (lambda () (interactive)
     (tom/select-frame 3)))
 
+;; bind find config
+(define-key global-map (kbd "<f10>")
+  (lambda () (interactive)
+    (find-file "~/src/nixemacs/readme.org")))
+
 ;; bind compile
 (define-key global-map (kbd "<f12>") 'compile)
 
 ;; load private configurations
 (load "~/Dropbox/Config/emacs/private.el" t)
 #+end_src
-
