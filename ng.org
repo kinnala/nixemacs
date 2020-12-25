@@ -5,13 +5,13 @@
 
 This is my reproducible Emacs configuration on top of Nix and straight.el.  Nix
 takes care of any system-level dependencies and downloading an initial version
-of straight.el which is a package manager for Emacs Lisp.
+of straight.el which manages Emacs Lisp packages.
 
 * Derivation for straight.el
 
 The initial version of straight.el is patched slightly so that it doesn't
-perform HTTP requests while bootstrapping.  All calls to githubusercontent.com
-are replaced by file reads.
+perform any HTTP requests while bootstrapping.  All calls to
+githubusercontent.com are replaced by file reads from Nix store.
 
 #+begin_src nix :mkdirp yes :tangle ~/.config/nixpkgs/straight/default.nix
 { stdenv, fetchFromGitHub }:
@@ -71,16 +71,636 @@ self: super:
       self.ripgrep
       self.gnumake
       self.git
+      self.mu
     ];
   };
 }
 #+end_src
 
+* Pinning Emacs packages
+
+#+begin_src elisp :mkdirp yes :tangle ~/tmp/.emacs.d/straight/versions/default.el
+(("Emacs-wgrep" . "f0ef9bfa44db503cdb2f83fcfbd2fa4e2382ef1f")
+ ("Highlight-Indentation-for-Emacs" . "4fc4e346c17e4e975a8c8ece3d4e7240357e2869")
+ ("auth-source-pass" . "aa7f17116ec3f760eb414d655ba20016b11a4a0e")
+ ("csv-mode" . "80930bc0d8c7228cd8706c2c989bdd3a3667fbeb")
+ ("dash.el" . "0517ab1ed18fd3af3c6131ca9e3a6e915036f809")
+ ("dired-k" . "0ddf0adb3a642c2f0694d8c1c12f263f2bf27375")
+ ("diredfl" . "cd052dfef602fe79d8dfbcf9f06e6da74412218b")
+ ("dumb-jump" . "ff9fc9360d39f5e07c1f480f8b0656b49606781b")
+ ("emacs-async" . "14f48de586b0977e3470f053b810d77b07ea427a")
+ ("emacs-leuven-theme" . "898c1426c29abbb1c86a715b1323669e30d4699e")
+ ("emacs-which-key" . "428aedfce0157920814fbb2ae5d00b4aea89df88")
+ ("emacsmirror-mirror" . "73d68771488284cceb42f70fda551e0a516cb249")
+ ("exec-path-from-shell" . "d14d6d2966efe5a1409f84a6b9d998268f74761d")
+ ("expand-region.el" . "ea6b4cbb9985ddae532bd2faf9bb00570c9f2781")
+ ("gnu-elpa-mirror" . "fcb3cf5ba5f16885f7851885c954222aee6f03ab")
+ ("hydra" . "2d553787aca1aceb3e6927e426200e9bb9f056f1")
+ ("ivy-pass" . "5b523de1151f2109fdd6a8114d0af12eef83d3c5")
+ ("json-mode" . "0e819e519ae17a2686e0881c4ca51fa873fa9b83")
+ ("json-reformat" . "8eb6668ed447988aea06467ba8f42e1f2178246f")
+ ("json-snatcher" . "b28d1c0670636da6db508d03872d96ffddbc10f2")
+ ("magit" . "ab0e0b80abcc01ca041321d1ffd2b9c0d83e2465")
+ ("markdown-mode" . "e250a8465f805644d372c264eb0572f569d7f2a1")
+ ("melpa" . "2e08b9272fe0416469ea00ba2ec6bbda4beca3cb")
+ ("multiple-cursors.el" . "a9d7764f80b241978f3d4e76bc981ef10bab5d70")
+ ("nix-mode" . "e32c6bf7ad6dfe1d7ef9ee07d4da6e50174037bf")
+ ("org" . "7a9a8a56af4cf02abc1fb86eda96f0c7dc6b0348")
+ ("password-store" . "f152064da9832d6d3d2b4e75f43f63bf2d50716f")
+ ("phi-search" . "c34f5800968922d1f9e7b10092b8705d6640ad18")
+ ("popup-el" . "13364d7674535db225789b03da766746734a4f28")
+ ("s.el" . "43ba8b563bee3426cead0e6d4ddc09398e1a349d")
+ ("straight.el" . "2d407bccd9378f1d5218f8ba2ae85c6be73fbaf1")
+ ("swiper" . "34a203f05457cdc227ff36e28ca1d3a7f03c8c15")
+ ("transient" . "4a2b7fdf75c6940b5b311d930ea26f7e85a08cd4")
+ ("use-package" . "caa92f1d64fc25480551757d854b4b49981dfa6b")
+ ("virtualenvwrapper.el" . "107e7e0bf923f44d217712772cd58b414d0065cb")
+ ("with-editor" . "6735180e73e787b79535c245b162249b70dbf841")
+ ("yaml-mode" . "fc5e1c58f94472944c4aa838f00f6adcac6fa992"))
+:beta
+#+end_src
+
 * Emacs init-file
 
-The first line runs the custom straight.el initialization script from Nix
-store.
+This configures straight.el and runs the customized straight.el initialization
+script from Nix store.
 
-#+begin_src emacs-lisp
+#+begin_src elisp :mkdirp yes :tangle ~/tmp/.emacs.d/init.el
+(setq straight-use-package-by-default t)
+(setq straight-vc-git-default-clone-depth 20)
 (load-file (shell-command-to-string "straight-init-path"))
+(straight-use-package 'use-package)
+#+end_src
+
+** org-mode
+
+#+begin_src elisp :mkdirp yes :tangle ~/tmp/.emacs.d/init.el
+(use-package org
+  :commands org-babel-do-load-languages
+  :config
+  (unbind-key "C-," org-mode-map)
+  (unbind-key "C-." org-mode-map)
+  :init
+  (add-hook 'org-mode-hook (lambda ()
+                             (fset 'tex-font-lock-suscript 'ignore)
+                             (org-babel-do-load-languages
+                              'org-babel-load-languages
+                              '((python . t)
+                                (shell . t)))))
+  (add-hook 'org-babel-after-execute-hook 'org-redisplay-inline-images)
+  (global-set-key [remap org-set-tags-command] #'counsel-org-tag)
+  (fset 'tex-font-lock-suscript 'ignore)
+  (setq org-default-notes-file "~/Dropbox/Notes/gtd/inbox.org"
+        org-agenda-files '("~/Dropbox/Notes/gtd/")
+        org-refile-targets '((nil :maxlevel . 9)
+                             (org-agenda-files :maxlevel . 9))
+        org-log-done 'time
+        org-tags-column 0
+        org-agenda-tags-column 0
+        org-agenda-window-setup 'only-window
+        org-export-babel-evaluate nil
+        org-startup-folded nil
+        org-adapt-indentation nil
+        org-refile-use-outline-path 'file
+        org-structure-template-alist '(("l" . "latex latex")
+                                       ("s" . "src"))
+        org-outline-path-complete-in-steps nil
+        org-duration-format '(("d" . nil) ("h" . t) (special . 2))
+        org-format-latex-options '(:foreground default
+                                   :background default
+                                   :scale 1.5
+                                   :html-foreground "Black"
+                                   :html-background "Transparent"
+                                   :html-scale 1.0
+                                   :matchers
+                                   ("begin" "$1" "$" "$$" "\\(" "\\["))
+        org-src-preserve-indentation t
+        org-confirm-babel-evaluate nil
+        org-html-validation-link nil
+        python-shell-completion-native-disabled-interpreters '("python")
+        org-babel-default-header-args:sh '((:prologue . "exec 2>&1")
+                                           (:epilogue . ":"))
+        org-capture-templates '(("t" "Todo" entry
+                                 (file "~/Dropbox/Notes/gtd/inbox.org")
+                                 "* TODO %?\n  SCHEDULED: %t\n%i\n%a")
+                                ("k" "Entry" entry
+                                 (file "~/Dropbox/Notes/gtd/inbox.org")
+                                 "* %?\n%t")))
+  :bind (("C-c c" . org-capture)
+         ("C-c a" . org-agenda)))
+#+end_src
+
+
+** ivy and wgrep
+
+#+begin_src elisp :mkdirp yes :tangle ~/tmp/.emacs.d/init.el
+(use-package ivy
+  :commands
+  ivy-mode
+  :init
+  (ivy-mode 1)
+  (setq ivy-height 15
+        ivy-fixed-height-minibuffer t
+       	ivy-use-virtual-buffers t)
+  :bind (("C-x b" . ivy-switch-buffer)
+         ("C-c r" . ivy-resume)
+	 ("C-x C-b" . ibuffer)))
+
+(use-package counsel
+  :init
+  (setq counsel-find-file-ignore-regexp "\\archive\\'")
+  :bind (("M-x" . counsel-M-x)
+         ("C-x C-f" . counsel-find-file)
+         ("C-c g" . counsel-rg)
+         ("C-c G" . counsel-git)
+         ("C-c j" . counsel-file-jump)
+         ("C-x b" . counsel-switch-buffer)
+         ("C-c h" . counsel-minibuffer-history)
+         ("M-y" . counsel-yank-pop)))
+
+(use-package swiper
+  :bind ("C-c s" . swiper))
+
+(use-package wgrep)
+#+end_src
+
+** magit
+
+#+begin_src elisp :mkdirp yes :tangle ~/tmp/.emacs.d/init.el
+(use-package magit
+  :init
+  (setq magit-repository-directories '(("~/src" . 1)))
+  :bind (("C-x g" . magit-status)
+         ("C-c M-g" . magit-file-dispatch)))
+#+end_src
+
+** multiline editing
+
+#+begin_src elisp :mkdirp yes :tangle ~/tmp/.emacs.d/init.el
+(use-package expand-region
+  :after (org)
+  :bind ("C-." . er/expand-region)
+  :init
+  (require 'expand-region)
+  (require 'cl)
+  (defun mark-around* (search-forward-char)
+    (let* ((expand-region-fast-keys-enabled nil)
+           (char (or search-forward-char
+                     (char-to-string
+                      (read-char "Mark inner, starting with:"))))
+           (q-char (regexp-quote char))
+           (starting-point (point)))
+      (when search-forward-char
+        (search-forward char (point-at-eol)))
+      (cl-flet ((message (&rest args) nil))
+        (er--expand-region-1)
+        (er--expand-region-1)
+        (while (and (not (= (point) (point-min)))
+                    (not (looking-at q-char)))
+          (er--expand-region-1))
+        (er/expand-region -1))))
+  (defun mark-around ()
+    (interactive)
+    (mark-around* nil))
+  (define-key global-map (kbd "M-i") 'mark-around))
+
+(use-package multiple-cursors
+  :init
+  (define-key global-map (kbd "C-'") 'mc-hide-unmatched-lines-mode)
+  (define-key global-map (kbd "C-,") 'mc/mark-next-like-this)
+  (define-key global-map (kbd "C-;") 'mc/mark-all-dwim)
+  (setq hum/lines-to-expand 1))
+
+(use-package phi-search
+  :after multiple-cursors
+  :init (require 'phi-replace)
+  :bind ("C-:" . phi-replace)
+  :bind (:map mc/keymap
+              ("C-s" . phi-search)
+              ("C-r" . phi-search-backward)))
+#+end_src
+
+** dired
+
+#+begin_src elisp :mkdirp yes :tangle ~/tmp/.emacs.d/init.el
+(use-package term
+  :straight nil)
+
+(use-package dired-x
+  :straight nil)
+
+(use-package dired
+  :straight nil
+  :after (term dired-x)
+  :init
+  (setq dired-dwim-target t)
+  (setq dired-omit-files "^\\...+$")
+  (defun run-gnome-terminal-here ()
+    (interactive)
+    (shell-command "gnome-terminal"))
+  (setq dired-guess-shell-alist-user
+        '(("\\.pdf\\'" "evince")
+          ("\\.eps\\'" "evince")
+          ("\\.jpe?g\\'" "eog")
+          ("\\.png\\'" "eog")
+          ("\\.gif\\'" "eog")
+          ("\\.xpm\\'" "eog")))
+  :bind (("C-x C-j" . dired-jump))
+  :bind (:map dired-mode-map
+              ("'" . run-gnome-terminal-here)
+              ("j" . swiper)
+              ("s" . swiper)))
+
+(use-package dired-k
+  :after (dired)
+  :bind (:map dired-mode-map
+              ("g" . dired-k)))
+
+(use-package diredfl
+  :commands diredfl-global-mode
+  :init
+  (diredfl-global-mode)
+  (put 'diredp-tagged-autofile-name 'face-alias 'diredfl-tagged-autofile-name)
+  (put 'diredp-autofile-name 'face-alias 'diredfl-autofile-name)
+  (put 'diredp-ignored-file-name 'face-alias 'diredfl-ignored-file-name)
+  (put 'diredp-symlink 'face-alias 'diredfl-symlink)
+  (put 'diredp-compressed-file-name 'face-alias 'diredfl-compressed-file-name)
+  (put 'diredp-file-suffix 'face-alias 'diredfl-file-suffix)
+  (put 'diredp-compressed-extensions 'face-alias 'diredfl-compressed-extensions)
+  (put 'diredp-deletion 'face-alias 'diredfl-deletion)
+  (put 'diredp-deletion-file-name 'face-alias 'diredfl-deletion-file-name)
+  (put 'diredp-flag-mark-line 'face-alias 'diredfl-flag-mark-line)
+  (put 'diredp-rare-priv 'face-alias 'diredfl-rare-priv)
+  (put 'diredp-number 'face-alias 'diredfl-number)
+  (put 'diredp-exec-priv 'face-alias 'diredfl-exec-priv)
+  (put 'diredp-file-name 'face-alias 'diredfl-file-name)
+  (put 'diredp-dir-heading 'face-alias 'diredfl-dir-heading)
+  (put 'diredp-compressed-file-suffix 'face-alias 'diredfl-compressed-file-suffix)
+  (put 'diredp-flag-mark 'face-alias 'diredfl-flag-mark)
+  (put 'diredp-mode-set-explicitly 'face-alias 'diredfl-mode-set-explicitly)
+  (put 'diredp-executable-tag 'face-alias 'diredfl-executable-tag)
+  (put 'diredp-global-mode-hook 'face-alias 'diredfl-global-mode-hook)
+  (put 'diredp-ignore-compressed-flag 'face-alias 'diredfl-ignore-compressed-flag)
+  (put 'diredp-dir-priv 'face-alias 'diredfl-dir-priv)
+  (put 'diredp-date-time 'face-alias 'diredfl-date-time)
+  (put 'diredp-other-priv 'face-alias 'diredfl-other-priv)
+  (put 'diredp-no-priv 'face-alias 'diredfl-no-priv)
+  (put 'diredp-link-priv 'face-alias 'diredfl-link-priv)
+  (put 'diredp-write-priv 'face-alias 'diredfl-write-priv)
+  (put 'diredp-global-mode-buffers 'face-alias 'diredfl-global-mode-buffers)
+  (put 'dired-directory 'face-alias 'diredfl-dir-name)
+  (put 'diredp-read-priv 'face-alias 'diredfl-read-priv))
+#+end_src
+
+** syntax highlighting
+
+#+begin_src elisp :mkdirp yes :tangle ~/tmp/.emacs.d/init.el
+(use-package json-mode)
+
+(use-package highlight-indentation
+  :init
+  (defun set-hl-indent-color ()
+    (set-face-background 'highlight-indentation-face "#AAAAAA"))
+  (add-hook 'prog-mode-hook 'highlight-indentation-mode)
+  (add-hook 'prog-mode-hook 'set-hl-indent-color))
+
+(use-package yaml-mode)
+
+(use-package csv-mode
+  :mode "\\.csv$"
+  :init (setq csv-separators '(";")))
+
+(use-package markdown-mode
+  :commands (markdown-mode)
+  :mode (("\\.md\\'" . markdown-mode)
+         ("\\.markdown\\'" . markdown-mode)))
+
+(use-package nix-mode)
+#+end_src
+
+*** theme
+
+#+begin_src elisp :mkdirp yes :tangle ~/tmp/.emacs.d/init.el
+(use-package leuven-theme
+  :config
+  (load-theme 'leuven t)
+  (set-face-attribute 'font-lock-type-face nil :box 1)
+  (set-face-attribute 'font-lock-function-name-face nil :box 1))
+
+(global-hl-line-mode)
+#+end_src
+
+*** python
+
+#+begin_src elisp :mkdirp yes :tangle ~/tmp/.emacs.d/init.el
+(use-package dumb-jump
+  :bind (("M-." . dumb-jump-go)
+         ("M-," . dumb-jump-back))
+  :config (setq dumb-jump-selector 'ivy))
+
+(use-package virtualenvwrapper
+  :init (setq venv-location "~/.conda/envs"))
+
+(use-package hydra)
+
+;; from move-lines package, https://github.com/targzeta/move-lines
+(defun move-lines--internal (n)
+  "Moves the current line or, if region is actives, the lines surrounding
+region, of N lines. Down if N is positive, up if is negative"
+  (let* (text-start
+         text-end
+         (region-start (point))
+         (region-end region-start)
+         swap-point-mark
+         delete-latest-newline)
+
+    (when (region-active-p)
+      (if (> (point) (mark))
+          (setq region-start (mark))
+        (exchange-point-and-mark)
+        (setq swap-point-mark t
+              region-end (point))))
+
+    (end-of-line)
+    (if (< (point) (point-max))
+        (forward-char 1)
+      (setq delete-latest-newline t)
+      (insert-char ?\n))
+    (setq text-end (point)
+          region-end (- region-end text-end))
+
+    (goto-char region-start)
+    (beginning-of-line)
+    (setq text-start (point)
+          region-start (- region-start text-end))
+
+    (let ((text (delete-and-extract-region text-start text-end)))
+      (forward-line n)
+      (when (not (= (current-column) 0))
+        (insert-char ?\n)
+        (setq delete-latest-newline t))
+      (insert text))
+
+    (forward-char region-end)
+
+    (when delete-latest-newline
+      (save-excursion
+        (goto-char (point-max))
+        (delete-char -1)))
+
+    (when (region-active-p)
+      (setq deactivate-mark nil)
+      (set-mark (+ (point) (- region-start region-end)))
+      (if swap-point-mark
+          (exchange-point-and-mark)))))
+
+(defun move-lines-up (n)
+  "Moves the current line or, if region is actives, the lines surrounding
+region, up by N lines, or 1 line if N is nil."
+  (interactive "p")
+  (if (eq n nil)
+      (setq n 1))
+  (move-lines--internal (- n)))
+
+(defun move-lines-down (n)
+  "Moves the current line or, if region is actives, the lines surrounding
+region, down by N lines, or 1 line if N is nil."
+  (interactive "p")
+  (if (eq n nil)
+      (setq n 1))
+  (move-lines--internal n))
+
+(defun tom/shift-left (start end &optional count)
+  "Shift region left and activate hydra."
+  (interactive
+   (if mark-active
+       (list (region-beginning) (region-end) current-prefix-arg)
+     (list (line-beginning-position) (line-end-position) current-prefix-arg)))
+  (python-indent-shift-left start end count)
+  (tom/hydra-move-lines/body))
+
+(defun tom/shift-right (start end &optional count)
+  "Shift region right and activate hydra."
+  (interactive
+   (if mark-active
+       (list (region-beginning) (region-end) current-prefix-arg)
+     (list (line-beginning-position) (line-end-position) current-prefix-arg)))
+  (python-indent-shift-right start end count)
+  (tom/hydra-move-lines/body))
+
+(defun tom/move-lines-p ()
+  "Move lines up once and activate hydra."
+  (interactive)
+  (move-lines-up 1)
+  (tom/hydra-move-lines/body))
+
+(defun tom/move-lines-n ()
+  "Move lines down once and activate hydra."
+  (interactive)
+  (move-lines-down 1)
+  (tom/hydra-move-lines/body))
+
+(defhydra tom/hydra-move-lines ()
+  "Move one or multiple lines"
+  ("n" move-lines-down "down")
+  ("p" move-lines-up "up")
+  ("<" python-indent-shift-left "left")
+  (">" python-indent-shift-right "right"))
+
+(define-key global-map (kbd "C-c n") 'tom/move-lines-n)
+(define-key global-map (kbd "C-c p") 'tom/move-lines-p)
+(define-key global-map (kbd "C-c <") 'tom/shift-left)
+(define-key global-map (kbd "C-c >") 'tom/shift-right)
+#+end_src
+
+*** misc stuff
+
+#+begin_src elisp :mkdirp yes :tangle  ~/tmp/.emacs.d/init.el
+(use-package exec-path-from-shell
+  :commands exec-path-from-shell-initialize
+  :init (exec-path-from-shell-initialize))
+
+(use-package transient)
+
+(use-package which-key
+  :commands which-key-mode
+  :init (which-key-mode))
+
+(use-package ivy-pass
+  :commands ivy-pass
+  :init
+  (defun pass ()
+    "Call ivy-pass."
+    (interactive)
+    (ivy-pass)))
+
+;; useful functions
+
+(defun tom/unfill-paragraph (&optional region)
+  "Take REGION and turn it into a single line of text."
+  (interactive (progn (barf-if-buffer-read-only) '(t)))
+  (let ((fill-column (point-max))
+        (emacs-lisp-docstring-fill-column t))
+    (fill-paragraph nil region)))
+
+(define-key global-map "\M-Q" 'tom/unfill-paragraph)
+
+(defun tom/increment-number-decimal (&optional arg)
+  "Increment the number forward from point by 'arg'."
+  (interactive "p*")
+  (save-excursion
+    (save-match-data
+      (let (inc-by field-width answer)
+        (setq inc-by (if arg arg 1))
+        (skip-chars-backward "0123456789")
+        (when (re-search-forward "[0-9]+" nil t)
+          (setq field-width (- (match-end 0) (match-beginning 0)))
+          (setq answer (+ (string-to-number (match-string 0) 10) inc-by))
+          (when (< answer 0)
+            (setq answer (+ (expt 10 field-width) answer)))
+          (replace-match (format (concat "%0" (int-to-string field-width) "d")
+                                 answer)))))))
+
+(global-set-key (kbd "C-c x") 'tom/increment-number-decimal)
+
+;; other global configurations
+
+;; show current function in modeline
+(which-function-mode)
+
+;; scroll screen
+(define-key global-map "\M-n" 'scroll-up-line)
+(define-key global-map "\M-p" 'scroll-down-line)
+
+;; change yes/no to y/n
+(defalias 'yes-or-no-p 'y-or-n-p)
+(setq confirm-kill-emacs 'yes-or-no-p)
+
+;; enable winner-mode, previous window config with C-left
+(winner-mode 1)
+
+;; windmove
+(windmove-default-keybindings)
+
+;; fonts
+(set-face-attribute 'default nil :font "Liberation Mono-11")
+(set-face-attribute 'line-number nil :font "Liberation Mono-8")
+
+;; disable tool and menu bars
+(tool-bar-mode -1)
+(menu-bar-mode -1)
+(scroll-bar-mode -1)
+(blink-cursor-mode -1)
+
+;; change gc behavior
+(setq gc-cons-threshold 50000000)
+
+;; warn when opening large file
+(setq large-file-warning-threshold 100000000)
+
+;; disable startup screen
+(setq inhibit-startup-screen t)
+
+;; useful frame title format
+(setq frame-title-format
+      '((:eval (if (buffer-file-name)
+                   (abbreviate-file-name (buffer-file-name))
+                 "%b"))))
+
+;; automatic revert
+(global-auto-revert-mode t)
+
+;; highlight parenthesis, easier jumping with C-M-n/p
+(show-paren-mode 1)
+(setq show-paren-style 'expression)
+(setq show-paren-delay 0)
+
+;; control indentation
+(setq-default indent-tabs-mode nil)
+(setq tab-width 4)
+(setq c-basic-offset 4)
+
+;; modify scroll settings
+(setq scroll-preserve-screen-position t)
+
+;; set default fill width (e.g. M-q)
+(setq-default fill-column 79)
+
+;; window dividers
+(fringe-mode 0)
+(setq window-divider-default-places t
+      window-divider-default-bottom-width 1
+      window-divider-default-right-width 1)
+(window-divider-mode 1)
+
+;; display time in modeline
+(display-time-mode 1)
+
+;; put all backups to same directory to not clutter directories
+(setq backup-directory-alist '(("." . "~/.emacs.d/backups")))
+
+;; display line numbers
+(global-display-line-numbers-mode)
+
+;; browse in chrome
+(setq browse-url-browser-function 'browse-url-chrome)
+(setq shr-width 80)
+
+;; don't fontify latex
+(setq font-latex-fontify-script nil)
+
+;; set default encodings to utf-8
+(prefer-coding-system 'utf-8)
+(set-default-coding-systems 'utf-8)
+(set-language-environment 'utf-8)
+(set-selection-coding-system 'utf-8)
+
+;; make Customize to not modify this file
+(setq custom-file (make-temp-file "emacs-custom"))
+
+;; enable all disabled commands
+(setq disabled-command-function nil)
+
+;; ediff setup
+(setq ediff-window-setup-function 'ediff-setup-windows-plain)
+
+;; unbind keys
+(unbind-key "C-z" global-map)
+
+;; change emacs frame by number
+(defun tom/select-frame (n)
+  "Select frame identified by the number N."
+  (interactive)
+  (let ((frame (nth n (reverse (frame-list)))))
+    (if frame
+        (select-frame-set-input-focus frame)
+      (select-frame-set-input-focus (make-frame)))))
+
+(define-key global-map
+  (kbd "M-1")
+  (lambda () (interactive)
+    (tom/select-frame 0)))
+(define-key global-map
+  (kbd "M-2")
+  (lambda () (interactive)
+    (tom/select-frame 1)))
+(define-key global-map
+  (kbd "M-3")
+  (lambda () (interactive)
+    (tom/select-frame 2)))
+(define-key global-map
+  (kbd "M-4")
+  (lambda () (interactive)
+    (tom/select-frame 3)))
+
+;; bind find config
+(define-key global-map (kbd "<f10>")
+  (lambda () (interactive)
+    (find-file "~/src/nixos/readme.org")))
+
+;; bind compile
+(define-key global-map (kbd "<f12>") 'compile)
+
+;; load private configurations
+(load "~/Dropbox/Config/emacs/private.el" t)
 #+end_src
