@@ -7,6 +7,18 @@ This is my reproducible Emacs configuration on top of Nix and straight.el.  Nix
 takes care of any system-level dependencies and downloading an initial version
 of straight.el which then manages the Emacs Lisp packages.
 
+* Installation
+
+You can try the config, e.g., inside Docker by running the following steps:
+
+1. =docker run -it nixos/nix /bin/sh=
+2. =nix-shell -p emacs git=
+3. =git clone https://github.com/kinnala/nixemacs.git && cd nixemacs=
+5. =emacs --file readme.org --eval '(progn (org-babel-tangle) (kill-emacs))'=
+6. =nix-env -i tom=
+7. =emacs=
+
+
 * Derivation for straight.el
 
 The initial version of straight.el is patched slightly so that it doesn't
@@ -94,7 +106,6 @@ self: super:
  ("emacs-leuven-theme" . "898c1426c29abbb1c86a715b1323669e30d4699e")
  ("emacs-which-key" . "428aedfce0157920814fbb2ae5d00b4aea89df88")
  ("emacsmirror-mirror" . "73d68771488284cceb42f70fda551e0a516cb249")
- ("exec-path-from-shell" . "d14d6d2966efe5a1409f84a6b9d998268f74761d")
  ("expand-region.el" . "ea6b4cbb9985ddae532bd2faf9bb00570c9f2781")
  ("gnu-elpa-mirror" . "fcb3cf5ba5f16885f7851885c954222aee6f03ab")
  ("hydra" . "2d553787aca1aceb3e6927e426200e9bb9f056f1")
@@ -518,10 +529,6 @@ region, down by N lines, or 1 line if N is nil."
 *** misc stuff
 
 #+begin_src elisp :mkdirp yes :tangle  ~/.emacs.d/init.el
-(use-package exec-path-from-shell
-  :commands exec-path-from-shell-initialize
-  :init (exec-path-from-shell-initialize))
-
 (use-package transient)
 
 (use-package which-key
@@ -696,7 +703,7 @@ region, down by N lines, or 1 line if N is nil."
     (tom/select-frame 3)))
 
 ;; bind find config
-(define-key global-map (kbd "<f10>")
+(define-key global-map (kbd "<home>")
   (lambda () (interactive)
     (find-file "~/src/nixemacs/readme.org")))
 
