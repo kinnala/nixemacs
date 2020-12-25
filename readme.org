@@ -15,9 +15,10 @@ You can try the config, e.g., inside Docker by running the following steps:
 1. Start container: =docker run -it nixos/nix /bin/sh=
 2. Enter temporary shell for tangling: =nix-shell -p emacs-nox wget=
 3. Download this file: =wget https://raw.githubusercontent.com/kinnala/nixemacs/master/readme.org=
-4. Tangle this file: =emacs --file readme.org --eval '(progn (org-babel-tangle) (kill-emacs))'=
-5. Install packages using Nix: =nix-env -i tom=
-6. Run Emacs and install packages using straight.el: =emacs=
+4. Tangle this file: =emacs --file readme.org --eval "(progn (org-babel-tangle) (kill-emacs))"=
+5. Quit temporary shell: =exit=
+6. Install packages using Nix: =nix-env -i tom=
+7. Run Emacs and install packages using straight.el: =emacs=
 
 * Derivation for straight.el
 
