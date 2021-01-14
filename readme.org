@@ -179,6 +179,7 @@ script):
   (setq org-agenda-window-setup 'only-window)
   (setq org-export-babel-evaluate nil)
   (setq org-startup-folded nil)
+  (setq org-agenda-skip-deadline-if-done t)
   (setq org-deadline-warning-days 5)
   (setq org-agenda-prefix-format '((agenda . " %i %-5e %-12:c%?-12t% s")
                                    (todo . " %i %-12:c %b")
