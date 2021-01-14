@@ -222,8 +222,7 @@ script):
   :init
   (ivy-mode 1)
   (setq ivy-height 15
-        ivy-fixed-height-minibuffer t
-       	ivy-use-virtual-buffers t)
+        ivy-fixed-height-minibuffer t)
   :bind (("C-x b" . ivy-switch-buffer)
          ("C-c r" . ivy-resume)
 	 ("C-x C-b" . ibuffer)))
