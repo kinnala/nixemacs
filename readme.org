@@ -169,43 +169,35 @@ script):
                               'org-babel-load-languages
                               '((python . t)
                                 (shell . t)))))
-  (add-hook 'org-babel-after-execute-hook 'org-redisplay-inline-images)
-  (global-set-key [remap org-set-tags-command] #'counsel-org-tag)
-  (fset 'tex-font-lock-suscript 'ignore)
-  (setq org-default-notes-file "~/Dropbox/Notes/gtd/inbox.org"
-        org-agenda-files '("~/Dropbox/Notes/gtd/")
-        org-refile-targets '((nil :maxlevel . 9)
-                             (org-agenda-files :maxlevel . 9))
-        org-log-done 'time
-        org-tags-column 0
-        org-agenda-tags-column 0
-        org-agenda-window-setup 'only-window
-        org-export-babel-evaluate nil
-        org-startup-folded nil
-        org-adapt-indentation nil
-        org-refile-use-outline-path 'file
-        org-structure-template-alist '(("l" . "latex latex")
-                                       ("s" . "src"))
-        org-outline-path-complete-in-steps nil
-        org-duration-format '(("d" . nil) ("h" . t) (special . 2))
-        org-format-latex-options '(:foreground default
-                                   :background default
-                                   :scale 1.5
-                                   :html-foreground "Black"
-                                   :html-background "Transparent"
-                                   :html-scale 1.0
-                                   :matchers
-                                   ("begin" "$1" "$" "$$" "\\(" "\\["))
-        org-src-preserve-indentation t
-        org-confirm-babel-evaluate nil
-        org-html-validation-link nil
-        python-shell-completion-native-disabled-interpreters '("python")
-        org-babel-default-header-args:sh '((:prologue . "exec 2>&1")
-                                           (:epilogue . ":"))
-        org-capture-templates '(("t" "Todo" entry
+  (setq org-default-notes-file "~/Dropbox/Notes/gtd/inbox.org")
+  (setq org-agenda-files '("~/Dropbox/Notes/gtd/")
+  (setq org-refile-targets '((nil :maxlevel . 9)
+                             (org-agenda-files :maxlevel . 9)))
+  (setq org-log-done 'time)
+  (setq org-tags-column 0)
+  (setq org-agenda-tags-column 0)
+  (setq org-agenda-window-setup 'only-window)
+  (setq org-export-babel-evaluate nil)
+  (setq org-startup-folded nil)
+  (setq org-deadline-warning-days 5)
+  (setq org-agenda-prefix-format '((agenda . " %i %-5e %-12:c%?-12t% s")
+                                   (todo . " %i %-12:c %b")
+                                   (tags . " %i %-12:c")
+                                   (search . " %i %-12:c")))
+  (setq org-adapt-indentation nil)
+  (setq org-refile-use-outline-path 'file)
+  (setq org-structure-template-alist '(("l" . "latex latex")
+                                       ("s" . "src")))
+  (setq org-outline-path-complete-in-steps nil)
+  (setq org-src-preserve-indentation t)
+  (setq org-confirm-babel-evaluate nil)
+  (setq org-html-validation-link nil)
+  (setq org-babel-default-header-args:sh '((:prologue . "exec 2>&1")
+                                           (:epilogue . ":")))
+  (setq org-capture-templates '(("t" "Todo" entry
                                  (file "~/Dropbox/Notes/gtd/inbox.org")
                                  "* TODO %?\n  SCHEDULED: %t\n%i\n%a")
-                                ("k" "Entry" entry
+                                ("k" "Event" entry
                                  (file "~/Dropbox/Notes/gtd/inbox.org")
                                  "* %?\n%t")))
   :bind (("C-c c" . org-capture)
