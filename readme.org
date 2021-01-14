@@ -170,7 +170,7 @@ script):
                               '((python . t)
                                 (shell . t)))))
   (setq org-default-notes-file "~/Dropbox/Notes/gtd/inbox.org")
-  (setq org-agenda-files '("~/Dropbox/Notes/gtd/")
+  (setq org-agenda-files '("~/Dropbox/Notes/gtd/"))
   (setq org-refile-targets '((nil :maxlevel . 9)
                              (org-agenda-files :maxlevel . 9)))
   (setq org-log-done 'time)
