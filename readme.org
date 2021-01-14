@@ -415,9 +415,10 @@ script):
 
 #+begin_src elisp :mkdirp yes :tangle ~/.emacs.d/init.el
 (use-package dumb-jump
-  :bind (("M-." . dumb-jump-go)
-         ("M-," . dumb-jump-back))
-  :config (setq dumb-jump-selector 'ivy))
+  :config
+  (setq dumb-jump-selector 'ivy)
+  :init
+  (add-hook 'xref-backend-functions #'dumb-jump-xref-activate))
 
 (use-package virtualenvwrapper
   :init (setq venv-location "~/.conda/envs"))
