@@ -375,8 +375,8 @@ script):
   :init
   (defun set-hl-indent-color ()
     (set-face-background 'highlight-indentation-face "#AAAAAA"))
-  (add-hook 'prog-mode-hook 'highlight-indentation-mode)
-  (add-hook 'prog-mode-hook 'set-hl-indent-color))
+  (add-hook 'python-mode-hook 'highlight-indentation-mode)
+  (add-hook 'python-mode-hook 'set-hl-indent-color))
 
 (use-package yaml-mode)
 
