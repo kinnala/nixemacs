@@ -372,11 +372,15 @@ script):
 (use-package json-mode)
 
 (use-package highlight-indentation
+  :commands (highlight-indentation-mode)
   :init
-  (defun set-hl-indent-color ()
-    (set-face-background 'highlight-indentation-face "#AAAAAA"))
-  (add-hook 'python-mode-hook 'highlight-indentation-mode)
-  (add-hook 'python-mode-hook 'set-hl-indent-color))
+  (defun tom/hl-indent-color ()
+     (set-face-background
+      'highlight-indentation-face
+      (face-attribute 'highlight :background)))
+  (advice-add 'highlight-indentation-mode :after #'tom/hl-indent-color)
+  :hook ((python-mode . highlight-indentation-mode)
+         (python-mode . display-fill-column-indicator-mode)))
 
 (use-package yaml-mode)
 
