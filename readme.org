@@ -541,14 +541,6 @@ region, down by N lines, or 1 line if N is nil."
   :commands which-key-mode
   :init (which-key-mode))
 
-(use-package ivy-pass
-  :commands ivy-pass
-  :init
-  (defun pass ()
-    "Call ivy-pass."
-    (interactive)
-    (ivy-pass)))
-
 ;; useful functions
 
 (defun tom/unfill-paragraph (&optional region)
