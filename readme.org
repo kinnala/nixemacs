@@ -169,8 +169,8 @@ script):
                               'org-babel-load-languages
                               '((python . t)
                                 (shell . t)))))
-  (setq org-default-notes-file "~/Dropbox/Notes/gtd/inbox.org")
-  (setq org-agenda-files '("~/Dropbox/Notes/gtd/"))
+  (setq org-default-notes-file "~/Dropbox/Notes/agenda/inbox.org")
+  (setq org-agenda-files '("~/Dropbox/Notes/agenda/"))
   (setq org-refile-targets '((nil :maxlevel . 9)
                              (org-agenda-files :maxlevel . 9)))
   (setq org-log-done 'time)
@@ -196,10 +196,10 @@ script):
   (setq org-babel-default-header-args:sh '((:prologue . "exec 2>&1")
                                            (:epilogue . ":")))
   (setq org-capture-templates '(("t" "Todo" entry
-                                 (file "~/Dropbox/Notes/gtd/inbox.org")
+                                 (file "~/Dropbox/Notes/agenda/inbox.org")
                                  "* TODO %?\n  SCHEDULED: %t\n%i\n%a")
                                 ("k" "Event" entry
-                                 (file "~/Dropbox/Notes/gtd/inbox.org")
+                                 (file "~/Dropbox/Notes/agenda/inbox.org")
                                  "* %?\n%t")))
   :bind (("C-c c" . org-capture)
          ("C-c a" . org-agenda)))
