@@ -88,9 +88,7 @@ self: super:
       self.ripgrep
       self.gnumake
       self.git
-      self.mu
       self.pass
-      self.offlineimap
     ];
   };
 }
