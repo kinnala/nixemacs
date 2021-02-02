@@ -123,6 +123,7 @@ This is a version lockfile for straight.el.
  ("melpa" . "2e08b9272fe0416469ea00ba2ec6bbda4beca3cb")
  ("multiple-cursors.el" . "a9d7764f80b241978f3d4e76bc981ef10bab5d70")
  ("nix-mode" . "e32c6bf7ad6dfe1d7ef9ee07d4da6e50174037bf")
+ ("rust-mode" . "ca7d99c6fd90fc1e636aa9d4020a2f077786a0c3")
  ("org" . "7a9a8a56af4cf02abc1fb86eda96f0c7dc6b0348")
  ("password-store" . "f152064da9832d6d3d2b4e75f43f63bf2d50716f")
  ("phi-search" . "c34f5800968922d1f9e7b10092b8705d6640ad18")
@@ -392,6 +393,8 @@ script):
          ("\\.markdown\\'" . markdown-mode)))
 
 (use-package nix-mode)
+
+(use-package rust-mode)
 #+end_src
 
 *** theme
