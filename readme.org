@@ -580,6 +580,44 @@ region, down by N lines, or 1 line if N is nil."
 (define-key global-map "\M-n" 'end-of-buffer)
 (define-key global-map "\M-p" 'beginning-of-buffer)
 
+;; misc iOS fixes
+(defun insert-backslash ()
+  (interactive)
+  (insert "\\"))
+
+(defun insert-brace-open ()
+  (interactive)
+  (insert "{"))
+
+(defun insert-brace-close ()
+  (interactive)
+  (insert "}"))
+
+(defun insert-bracket-open ()
+  (interactive)
+  (insert "["))
+
+(defun insert-bracket-close ()
+  (interactive)
+  (insert "]"))
+
+(defun insert-et-sign ()
+  (interactive)
+  (insert "@"))
+
+(defun insert-dollar-sign ()
+  (interactive)
+  (insert "$"))
+
+(global-set-key (kbd "M-+") 'insert-backslash)
+(global-set-key (kbd "M-2") 'insert-et-sign)
+(global-set-key (kbd "M-4") 'insert-dollar-sign)
+(global-set-key (kbd "M-7") 'insert-brace-open)
+(global-set-key (kbd "M-8") 'insert-bracket-open)
+(global-set-key (kbd "M-9") 'insert-bracket-close)
+(global-set-key (kbd "M-0") 'insert-brace-close)
+(global-set-key (kbd "C-x C-x") 'set-mark-command)
+
 ;; change yes/no to y/n
 (defalias 'yes-or-no-p 'y-or-n-p)
 (setq confirm-kill-emacs 'yes-or-no-p)
@@ -685,19 +723,19 @@ region, down by N lines, or 1 line if N is nil."
       (select-frame-set-input-focus (make-frame)))))
 
 (define-key global-map
-  (kbd "M-1")
+  (kbd "<f1>")
   (lambda () (interactive)
     (tom/select-frame 0)))
 (define-key global-map
-  (kbd "M-2")
+  (kbd "<f2>")
   (lambda () (interactive)
     (tom/select-frame 1)))
 (define-key global-map
-  (kbd "M-3")
+  (kbd "<f3>")
   (lambda () (interactive)
     (tom/select-frame 2)))
 (define-key global-map
-  (kbd "M-4")
+  (kbd "<f4>")
   (lambda () (interactive)
     (tom/select-frame 3)))
 
