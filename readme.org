@@ -400,11 +400,9 @@ script):
 *** theme
 
 #+begin_src elisp :mkdirp yes :tangle ~/.emacs.d/init.el
-(use-package leuven-theme
+(use-package moe-theme
   :config
-  (load-theme 'leuven t)
-  (set-face-attribute 'font-lock-type-face nil :box 1)
-  (set-face-attribute 'font-lock-function-name-face nil :box 1))
+  (load-theme 'moe-dark t))
 
 (global-hl-line-mode)
 #+end_src
