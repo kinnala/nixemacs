@@ -533,6 +533,9 @@ region, down by N lines, or 1 line if N is nil."
 #+begin_src elisp :mkdirp yes :tangle  ~/.emacs.d/init.el
 (use-package transient)
 
+(use-package xclip
+  :init (xclip-mode))
+
 (use-package which-key
   :commands which-key-mode
   :init (which-key-mode))
@@ -624,8 +627,8 @@ region, down by N lines, or 1 line if N is nil."
 (windmove-default-keybindings)
 
 ;; fonts
-(set-face-attribute 'default nil :font "Liberation Mono-11")
-(set-face-attribute 'line-number nil :font "Liberation Mono-11")
+(set-face-attribute 'default nil :font "Liberation Mono-13")
+(set-face-attribute 'line-number nil :font "Liberation Mono-13")
 
 ;; disable tool and menu bars
 (tool-bar-mode -1)
