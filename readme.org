@@ -627,8 +627,8 @@ region, down by N lines, or 1 line if N is nil."
 (windmove-default-keybindings)
 
 ;; fonts
-(set-face-attribute 'default nil :font "Liberation Mono-16")
-(set-face-attribute 'line-number nil :font "Liberation Mono-16")
+(set-face-attribute 'default nil :font "Liberation Mono-14")
+(set-face-attribute 'line-number nil :font "Liberation Mono-14")
 
 ;; disable tool and menu bars
 (tool-bar-mode -1)
