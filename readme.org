@@ -249,7 +249,7 @@ script):
 #+begin_src elisp :mkdirp yes :tangle ~/.emacs.d/init.el
 (use-package expand-region
   :after (org)
-  :bind ("C-c ." . er/expand-region)
+  :bind ("C-." . er/expand-region)
   :init
   (require 'expand-region)
   (require 'cl)
@@ -277,14 +277,14 @@ script):
 (use-package multiple-cursors
   :init
   (define-key global-map (kbd "C-'") 'mc-hide-unmatched-lines-mode)
-  (define-key global-map (kbd "C-c ,") 'mc/mark-next-like-this)
-  (define-key global-map (kbd "C-c ;") 'mc/mark-all-dwim)
+  (define-key global-map (kbd "C-,") 'mc/mark-next-like-this)
+  (define-key global-map (kbd "C-;") 'mc/mark-all-dwim)
   (setq hum/lines-to-expand 1))
 
 (use-package phi-search
   :after multiple-cursors
   :init (require 'phi-replace)
-  :bind ("C-c :" . phi-replace)
+  :bind ("C-:" . phi-replace)
   :bind (:map mc/keymap
               ("C-s" . phi-search)
               ("C-r" . phi-search-backward)))
