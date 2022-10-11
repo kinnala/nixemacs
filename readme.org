@@ -543,8 +543,6 @@ region, down by N lines, or 1 line if N is nil."
 #+begin_src elisp :mkdirp yes :tangle  ~/.emacs.d/init.el
 (use-package transient)
 
-(use-package pdf-tools)
-
 (use-package xclip
   :init (xclip-mode))
 
