@@ -99,42 +99,47 @@ self: super:
 This is a version lockfile for straight.el.
 
 #+begin_src elisp :mkdirp yes :tangle ~/.emacs.d/straight/versions/default.el
-(("Emacs-wgrep" . "f0ef9bfa44db503cdb2f83fcfbd2fa4e2382ef1f")
- ("Highlight-Indentation-for-Emacs" . "4fc4e346c17e4e975a8c8ece3d4e7240357e2869")
- ("csv-mode" . "80930bc0d8c7228cd8706c2c989bdd3a3667fbeb")
- ("dash.el" . "0517ab1ed18fd3af3c6131ca9e3a6e915036f809")
- ("dired-k" . "0ddf0adb3a642c2f0694d8c1c12f263f2bf27375")
- ("diredfl" . "cd052dfef602fe79d8dfbcf9f06e6da74412218b")
- ("dumb-jump" . "ff9fc9360d39f5e07c1f480f8b0656b49606781b")
- ("emacs-async" . "14f48de586b0977e3470f053b810d77b07ea427a")
- ("moe-theme" . "b23975ba57a68f69551424552f484227db8a7b97")
- ("emacs-which-key" . "428aedfce0157920814fbb2ae5d00b4aea89df88")
- ("emacsmirror-mirror" . "73d68771488284cceb42f70fda551e0a516cb249")
- ("expand-region.el" . "ea6b4cbb9985ddae532bd2faf9bb00570c9f2781")
- ("gnu-elpa-mirror" . "fcb3cf5ba5f16885f7851885c954222aee6f03ab")
- ("hydra" . "2d553787aca1aceb3e6927e426200e9bb9f056f1")
- ("json-mode" . "0e819e519ae17a2686e0881c4ca51fa873fa9b83")
+(("Emacs-wgrep" . "f9687c28bbc2e84f87a479b6ce04407bb97cfb23")
+ ("Highlight-Indentation-for-Emacs" . "d88db4248882da2d4316e76ed673b4ac1fa99ce3")
+ ("csv-mode" . "53beddc207864b0c3f81da85b59245dff8eea5ce")
+ ("dash.el" . "76606f90774c5349f7adac20c33e6d37a1939a1f")
+ ("dired-k" . "1ddd8e0ea06f0e25cd5dedb2370cfa0cacfa8c9d")
+ ("diredfl" . "62b559e1d6b69834a56a57eb1832ac6ad4d2e5d0")
+ ("dumb-jump" . "1dd583011f4025b1b8c75fd785691851b6c5dfa3")
+ ("el-get" . "a620c91fe7d6d482c0e7538df75e10af0af1bb16")
+ ("emacs-which-key" . "1ab1d0cc88843c9a614ed3226c5a1070e32e4823")
+ ("emacsmirror-mirror" . "2e1ceba3c8036637832e99414d9012359911f5e4")
+ ("expand-region.el" . "7e5bbe2763c12bae3e77fe0c49bcad05ff91dbfe")
+ ("f.el" . "feb6c2cb9f8e19ebdfdfde0d89edbdd5d7f51a96")
+ ("gnu-elpa-mirror" . "808923d95777d378ca340b8020dd571e6a62460a")
+ ("hydra" . "9e9e00cb240ea1903ffd36a54956b3902c379d29")
+ ("json-mode" . "eedb4560034f795a7950fa07016bd4347c368873")
  ("json-reformat" . "8eb6668ed447988aea06467ba8f42e1f2178246f")
  ("json-snatcher" . "b28d1c0670636da6db508d03872d96ffddbc10f2")
- ("magit" . "ab0e0b80abcc01ca041321d1ffd2b9c0d83e2465")
- ("markdown-mode" . "e250a8465f805644d372c264eb0572f569d7f2a1")
- ("melpa" . "2e08b9272fe0416469ea00ba2ec6bbda4beca3cb")
- ("multiple-cursors.el" . "a9d7764f80b241978f3d4e76bc981ef10bab5d70")
- ("nix-mode" . "e32c6bf7ad6dfe1d7ef9ee07d4da6e50174037bf")
- ("rust-mode" . "ca7d99c6fd90fc1e636aa9d4020a2f077786a0c3")
- ("org" . "7a9a8a56af4cf02abc1fb86eda96f0c7dc6b0348")
+ ("magit" . "a7953b2645503904b2a31e18e019f07af9e71a7a")
+ ("markdown-mode" . "4477f381de0068a04b55e198c32614793f67b38a")
+ ("melpa" . "40c73fda1fc5fd5cf01680838a9556fb3fa528cf")
+ ("moe-theme.el" . "edf3fe47fb986e283e3b04cba443dcb39fe8720e")
+ ("multiple-cursors.el" . "fd8441bfc8738d463601823e5a3d9c2d7123bfbf")
+ ("nix-mode" . "8fe2ccf0b01f694a77d2528e06c10f06057784f6")
+ ("org" . "604bfd9d755770e12c368c15148780ec723211df")
  ("phi-search" . "c34f5800968922d1f9e7b10092b8705d6640ad18")
- ("popup-el" . "13364d7674535db225789b03da766746734a4f28")
- ("s.el" . "43ba8b563bee3426cead0e6d4ddc09398e1a349d")
- ("straight.el" . "2d407bccd9378f1d5218f8ba2ae85c6be73fbaf1")
- ("swiper" . "34a203f05457cdc227ff36e28ca1d3a7f03c8c15")
- ("transient" . "4a2b7fdf75c6940b5b311d930ea26f7e85a08cd4")
- ("use-package" . "caa92f1d64fc25480551757d854b4b49981dfa6b")
- ("virtualenvwrapper.el" . "107e7e0bf923f44d217712772cd58b414d0065cb")
- ("with-editor" . "6735180e73e787b79535c245b162249b70dbf841")
- ("yaml-mode" . "fc5e1c58f94472944c4aa838f00f6adcac6fa992"))
+ ("popup-el" . "976bd8e06100df5a266377d0e5f63b104ba93119")
+ ("rust-mode" . "0df2f22479b98f76d97de90e1c390ff1b0902a46")
+ ("s.el" . "08661efb075d1c6b4fa812184c1e5e90c08795a9")
+ ("straight.el" . "af5437f2afd00936c883124d6d3098721c2d306c")
+ ("swiper" . "f8d80a4055514f92d94f128f5fcb1cda79e5cd22")
+ ("transient" . "2e4426fe8161893382f09b3f4635e152ee02488e")
+ ("use-package" . "a7422fb8ab1baee19adb2717b5b47b9c3812a84c")
+ ("virtualenvwrapper.el" . "c7e84505db4142fd1beebf38ffe37c3f42444ca3")
+ ("with-editor" . "4ab8c6148bb2698ff793d4a8acdbd8d0d642e133")
+ ("xclip" . "4772beb5579e13910c89c482a2e41271253c646b")
+ ("yaml-mode" . "535273d5a1eb76999d20afbcf4d9f056d8ffd2da"))
 :beta
 #+end_src
+
+Note: to update, run =straight-pull-all= and =straight-freeze-versions=
+and replace above with the contents of =~/.emacs.d/straight/versions/default.el=.
 
 * Emacs init file
 
@@ -175,6 +180,11 @@ script):
   (setq org-agenda-window-setup 'only-window)
   (setq org-export-babel-evaluate nil)
   (setq org-startup-folded nil)
+  (setq org-agenda-format-date
+      (lambda (date) (concat "\n"
+                             (make-string (window-width) 9472)
+                             "\n"
+                             (org-agenda-format-date-aligned date))))
   (setq org-agenda-skip-deadline-if-done t)
   (setq org-deadline-warning-days 5)
   (setq org-agenda-prefix-format '((agenda . " %i %-5e %-12:c%?-12t% s")
@@ -532,6 +542,8 @@ region, down by N lines, or 1 line if N is nil."
 
 #+begin_src elisp :mkdirp yes :tangle  ~/.emacs.d/init.el
 (use-package transient)
+
+(use-package pdf-tools)
 
 (use-package xclip
   :init (xclip-mode))
