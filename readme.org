@@ -317,7 +317,7 @@ script):
   (setq dired-omit-files "^\\...+$")
   (defun run-gnome-terminal-here ()
     (interactive)
-    (shell-command "gnome-terminal"))
+    (shell-command "kgx"))
   (setq dired-guess-shell-alist-user
         '(("\\.pdf\\'" "evince")
           ("\\.eps\\'" "evince")
