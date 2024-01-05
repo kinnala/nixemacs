@@ -87,7 +87,6 @@ self: super:
       self.straight.el
       self.ripgrep
       self.gnumake
-      self.git
       self.pass
     ];
   };
